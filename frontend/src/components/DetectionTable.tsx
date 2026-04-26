@@ -14,11 +14,11 @@ const CLASS_COLORS: Record<string, string> = {
 
 export default function DetectionTable({ messages }: DetectionTableProps) {
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-      <h2 className="text-sm font-semibold text-slate-300 p-4 border-b border-slate-700">
+    <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden flex flex-col h-80">
+      <h2 className="text-sm font-semibold text-slate-300 p-4 border-b border-slate-700 shrink-0">
         Canlı Tespitler
       </h2>
-      <div className="overflow-auto max-h-72">
+      <div className="overflow-y-auto flex-1">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-slate-400 text-xs uppercase border-b border-slate-700">

@@ -1,0 +1,33 @@
+Docker Desktop Aç
+docker compose up -d ---> Docker'ı ayağa kaldır.
+python mock_publisher.py ---> Mock değerleri başlatma.
+MQTT ve SignalIR bağlantılarını kontrol et.
+
+cd C:\Users\erend\highway-project
+docker compose up --build -d
+docker logs highwayserver -f
+
+
+
+Her oturum başında:
+# 1. Docker Desktop'ı aç (sistem tepsisinde balina görünene kadar bekle)
+
+# 2. Servisleri başlat
+cd C:\Users\erend\highway-project
+docker compose up -d
+
+# 3. Mock veri için (Jetson olmadığında)
+python mock_publisher.py
+
+# 4. Dashboard
+# Tarayıcıda http://localhost aç
+Geliştirme yaparken (hot reload):
+cd C:\Users\erend\highway-project\frontend
+npm run dev
+# http://localhost:5173 aç
+Frontend değişikliği deploy etmek için:
+cd C:\Users\erend\highway-project\frontend
+npm run build
+cd ..
+docker compose restart nginx
+

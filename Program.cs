@@ -22,7 +22,10 @@ builder.Services.AddCors(o =>
 var app = builder.Build();
 
 app.UseCors();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapControllers();
 app.MapHub<TelemetryHub>("/telemetryHub");
+app.MapFallbackToFile("index.html");
 
 app.Run();

@@ -11,9 +11,10 @@ import type { TelemetryMessage } from '../types/TelemetryMessage';
 
 interface SpeedChartProps {
   messages: TelemetryMessage[];
+  height?: number;
 }
 
-export default function SpeedChart({ messages }: SpeedChartProps) {
+export default function SpeedChart({ messages, height = 220 }: SpeedChartProps) {
   const data = messages
     .slice(0, 30)
     .reverse()
@@ -29,7 +30,7 @@ export default function SpeedChart({ messages }: SpeedChartProps) {
   return (
     <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
       <h2 className="text-sm font-semibold text-slate-300 mb-3">Hız Grafiği (Son 30 Kayıt)</h2>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis dataKey="time" tick={{ fill: '#94a3b8', fontSize: 11 }} interval="preserveStartEnd" />

@@ -4,6 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    outDir: '../wwwroot',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       '/telemetryHub': {
