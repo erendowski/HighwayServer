@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<InfluxService>();
 builder.Services.AddHostedService<MqttBackgroundService>();
+builder.Services.AddHostedService<MockTelemetryService>();
 
 var origins = builder.Configuration
     .GetSection("Cors:Origins")

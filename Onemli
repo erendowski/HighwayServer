@@ -31,3 +31,5 @@ npm run build
 cd ..
 docker compose restart nginx
 
+dotnet run ---> 5000 portu
+npm run dev 

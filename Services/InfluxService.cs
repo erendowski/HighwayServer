@@ -26,7 +26,7 @@ public class InfluxService
         var point = PointData.Measurement("detections")
             .Tag("vehicleId", msg.VehicleId)
             .Tag("class",     msg.Class)
-            .Tag("trackId",   msg.TrackId)
+            .Tag("trackId",   msg.TrackId.ToString())
             .Field("speed",   msg.Speed)
             .Timestamp(msg.Timestamp, WritePrecision.Ms);
 
@@ -62,7 +62,7 @@ public class InfluxService
                 Class     = record.GetValueByKey("class")?.ToString()     ?? string.Empty,
                 Speed     = Convert.ToDouble(record.GetValueByKey("speed") ?? 0d),
                 Timestamp = record.GetTime()?.ToDateTimeUtc() ?? DateTime.UtcNow,
-                TrackId   = record.GetValueByKey("trackId")?.ToString()   ?? string.Empty,
+                TrackId   = Convert.ToInt32(record.GetValueByKey("trackId") ?? 0),
             });
         }
 

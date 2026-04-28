@@ -63,38 +63,31 @@ public class MqttBackgroundService : BackgroundService
             }
         };
 
-        client.DisconnectedAsync += async e =>
-        {
-            if (stoppingToken.IsCancellationRequested) return;
-            _logger.LogWarning("MQTT disconnected — reconnecting in 5 s...");
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            try   { await client.ConnectAsync(options, stoppingToken); }
-            catch (Exception ex) { _logger.LogError(ex, "MQTT reconnect failed"); }
-        };
+        var subOptions = factory.CreateSubscribeOptionsBuilder()
+            .WithTopicFilter(f => f.WithTopic("highway/detections/#"))
+            .Build();
 
-        // Initial connect with retry
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
                 await client.ConnectAsync(options, stoppingToken);
                 _logger.LogInformation("MQTT connected to {Host}:{Port}", host, port);
+                await client.SubscribeAsync(subOptions, stoppingToken);
+                _logger.LogInformation("Subscribed to highway/detections/#");
+                await Task.Delay(Timeout.Infinite, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
                 break;
             }
-            catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
+            catch (Exception ex)
             {
-                _logger.LogWarning(ex, "MQTT connect failed — retrying in 5 s...");
+                _logger.LogWarning(ex, "MQTT connection lost — retrying in 5 s...");
+                if (client.IsConnected)
+                    await client.DisconnectAsync();
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
         }
-
-        var subOptions = factory.CreateSubscribeOptionsBuilder()
-            .WithTopicFilter(f => f.WithTopic("highway/detections/#"))
-            .Build();
-
-        await client.SubscribeAsync(subOptions, stoppingToken);
-        _logger.LogInformation("Subscribed to highway/detections/#");
-
-        await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 }

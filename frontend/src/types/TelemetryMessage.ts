@@ -4,4 +4,5 @@ export interface TelemetryMessage {
   class: string;
   speed: number;
   timestamp: string;
+  snapshotUrl?: string | null;
 }

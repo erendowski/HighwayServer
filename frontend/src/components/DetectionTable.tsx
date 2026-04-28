@@ -2,6 +2,7 @@ import type { TelemetryMessage } from '../types/TelemetryMessage';
 
 interface DetectionTableProps {
   messages: TelemetryMessage[];
+  onSelect: (message: TelemetryMessage) => void;
 }
 
 const CLASS_COLORS: Record<string, string> = {
@@ -12,7 +13,7 @@ const CLASS_COLORS: Record<string, string> = {
   'semi-truck': 'bg-red-900 text-red-300',
 };
 
-export default function DetectionTable({ messages }: DetectionTableProps) {
+export default function DetectionTable({ messages, onSelect }: DetectionTableProps) {
   return (
     <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden flex flex-col h-80">
       <h2 className="text-sm font-semibold text-slate-300 p-4 border-b border-slate-700 shrink-0">
@@ -32,7 +33,8 @@ export default function DetectionTable({ messages }: DetectionTableProps) {
             {messages.map((m, i) => (
               <tr
                 key={`${m.vehicleId}-${i}`}
-                className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
+                className="border-b border-slate-700/50 hover:bg-slate-600/50 transition-colors cursor-pointer"
+                onClick={() => onSelect(m)}
               >
                 <td className="px-4 py-2 text-slate-300 font-mono text-xs">{m.vehicleId}</td>
                 <td className="px-4 py-2">

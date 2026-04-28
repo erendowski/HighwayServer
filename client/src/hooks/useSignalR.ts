@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import type { TelemetryMessage } from '../types/TelemetryMessage';
 
 const MAX_MESSAGES = 100;
-const HUB_URL = import.meta.env.VITE_API_URL + '/telemetryHub';
+const HUB_URL = 'http://localhost:5000/telemetryHub';
 
 export function useSignalR() {
   const [messages, setMessages] = useState<TelemetryMessage[]>([]);
