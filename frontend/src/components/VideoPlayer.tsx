@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const WHEP_URL = import.meta.env.VITE_API_URL + '/whep/cam1/whep';
+const WHEP_URL = import.meta.env.VITE_API_URL + '/whep/stream/whep';
 
 export default function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);

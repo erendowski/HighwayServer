@@ -34,12 +34,12 @@ export default function VehicleDetailModal({ message, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 relative"
+        className="bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 relative"
         onClick={e => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-lg leading-none"
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors text-lg leading-none"
         >
           ✕
         </button>
@@ -50,26 +50,26 @@ export default function VehicleDetailModal({ message, onClose }: Props) {
 
         <div className="space-y-3 mb-6">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Track ID</span>
+            <span className="text-slate-400">Track ID</span>
             <span className="text-white font-mono">{message.trackId}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Sınıf</span>
+            <span className="text-slate-400">Sınıf</span>
             <span className="text-white">{emoji} {message.class}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Hız</span>
+            <span className="text-slate-400">Hız</span>
             <span className={`font-semibold ${message.speed > 120 ? 'text-red-400' : 'text-white'}`}>
               {message.speed.toFixed(1)} km/h
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Zaman</span>
+            <span className="text-slate-400">Zaman</span>
             <span className="text-white">{new Date(message.timestamp).toLocaleString('tr-TR')}</span>
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden bg-gray-700">
+        <div className="rounded-lg overflow-hidden bg-slate-700">
           {message.snapshotUrl ? (
             <img
               src={message.snapshotUrl}
@@ -77,8 +77,8 @@ export default function VehicleDetailModal({ message, onClose }: Props) {
               className="w-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center h-40 text-gray-500 text-sm">
-              Görüntü mevcut değil
+            <div className="flex items-center justify-center h-40 text-slate-500 text-sm">
+              Görüntü henüz mevcut değil
             </div>
           )}
         </div>

@@ -1,35 +1,54 @@
-Docker Desktop Aç
-docker compose up -d ---> Docker'ı ayağa kaldır.
-python mock_publisher.py ---> Mock değerleri başlatma.
-MQTT ve SignalIR bağlantılarını kontrol et.
+1) Docker Desktop aç
+2) Proje dizininde .env dosyası oluştur:
+   copy .env.example .env
+3) Parolaları/token değerlerini .env içinde güncelle
+4) Üretim ortamını ayağa kaldır:
+   docker compose up -d --build
+5) Uygulama:
+   http://localhost
+6) Servis panelleri:
+   EMQX Dashboard: http://localhost:18083
+   InfluxDB UI: http://localhost:8086
 
-cd C:\Users\erend\highway-project
-docker compose up --build -d
-docker logs highwayserver -f
-
-
-
-Her oturum başında:
-# 1. Docker Desktop'ı aç (sistem tepsisinde balina görünene kadar bekle)
-
-# 2. Servisleri başlat
-cd C:\Users\erend\highway-project
-docker compose up -d
-
-# 3. Mock veri için (Jetson olmadığında)
+Mock MQTT veri göndermek için (gerekiyorsa):
 python mock_publisher.py
 
-# 4. Dashboard
-# Tarayıcıda http://localhost aç
-Geliştirme yaparken (hot reload):
-cd C:\Users\erend\highway-project\frontend
-npm run dev
-# http://localhost:5173 aç
-Frontend değişikliği deploy etmek için:
-cd C:\Users\erend\highway-project\frontend
-npm run build
-cd ..
-docker compose restart nginx
+Log izleme:
+docker compose logs -f highwayserver
 
-dotnet run ---> 5000 portu
-npm run dev 
+Durdurma:
+docker compose down
+
+Kamera yayını:
+docker compose up -d --force-recreate nginx
+docker compose logs -f nginx mediamtx
+Jetson RTSP (/stream) → RPi MediaMTX (cam1) → Nginx /whep → Browser dashboard.
+
+*KAMERA SİSTEMİN ÇALIŞMA ÖZETİ*
+Altyapıyı RPi5’te ayağa kaldırdın
+highwayserver + nginx + emqx + influxdb + mediamtx container’ları çalıştı.
+
+Jetson ve RPi’yi Tailscale ile birbirine erişir yaptın
+Jetson’ın Tailscale IP’sine (100.74.245.10) RPi’den erişim doğrulandı.
+
+Jetson RTSP kaynağını sabit kabul ettik
+Jetson tarafında yayın /stream path’inde çalışıyor (Jetson tarafına müdahale etmedik).
+
+RPi’de MediaMTX’i Jetson kaynağını pull edecek şekilde ayarladın
+cam1 path’i için source olarak rtsp://100.74.245.10:8554/stream tanımlandı.
+Böylece RPi’de cam1 canlı kaynak oldu.
+
+Bağlantı sorununu ağ/policy tarafında çözdün
+İlk başta timeout/refused vardı; erişim açılınca MediaMTX logunda
+stream is available and online görüldü.
+
+Nginx proxy path’ini düzelttin
+Browser /whep/cam1/whep isterken, Nginx yanlış path forward ettiği için whep/cam1 hatası oluyordu.
+/whep proxy doğru hale gelince MediaMTX doğru path’i (cam1) gördü.
+
+Frontend zaten WHEP endpoint’ine gidiyordu
+VideoPlayer, /whep/cam1/whep çağırdı; Nginx bunu MediaMTX’e iletti; MediaMTX WebRTC cevap verdi.
+
+Sonuç
+Akış: Jetson RTSP (/stream) → RPi MediaMTX (cam1) → Nginx /whep → Browser (WebRTC)
+ve dashboard’da canlı görüntü açıldı.
