@@ -1,48 +1,45 @@
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts'
-import type { TelemetryMessage } from '../types/TelemetryMessage'
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Cell,
+} from 'recharts';
+import { useActiveTracks } from '../store/selectors';
 
-const VEHICLE_CLASSES = ['car', 'truck', 'bus', 'motorcycle', 'semi-truck'] as const
+interface VehicleTypeChartProps {
+  sensorId: string;
+}
+
+const VEHICLE_CLASSES = ['car', 'van', 'bus', 'motorcycle', 'drone', 'plane'] as const;
 
 const BAR_COLORS: Record<string, string> = {
   car: '#38bdf8',
-  truck: '#fb923c',
+  van: '#3b82f6',
   bus: '#4ade80',
   motorcycle: '#c084fc',
-  'semi-truck': '#f87171',
-}
+  drone: '#a855f7',
+  plane: '#06b6d4',
+};
 
-const LABELS: Record<string, string> = {
-  car: 'Otomobil',
-  truck: 'Kamyon',
-  bus: 'Otobüs',
-  motorcycle: 'Motosiklet',
-  'semi-truck': 'TIR',
-}
+export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
+  const tracks = useActiveTracks(sensorId);
 
-interface VehicleTypeChartProps {
-  messages: TelemetryMessage[]
-}
+  if (tracks.length === 0) {
+    return (
+      <div className="bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center h-60">
+        <span className="text-slate-500 text-sm">No data</span>
+      </div>
+    );
+  }
 
-export default function VehicleTypeChart({ messages }: VehicleTypeChartProps) {
   const data = VEHICLE_CLASSES.map(cls => ({
-    name: LABELS[cls],
-    count: messages.filter(m => m.class === cls).length,
-    color: BAR_COLORS[cls],
-  }))
+    name: cls,
+    count: tracks.filter(t => t.vehicleClass === cls).length,
+    color: BAR_COLORS[cls] ?? '#94a3b8',
+  }));
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 flex flex-col h-80">
+    <div className="bg-slate-800 rounded-xl border border-slate-700 flex flex-col h-60">
       <h2 className="text-sm font-semibold text-slate-300 p-4 border-b border-slate-700 shrink-0">
-        Araç Tipi Dağılımı
+        Vehicle Classes — {sensorId}
       </h2>
       <div className="flex-1 p-3">
         <ResponsiveContainer width="100%" height="100%">
@@ -62,14 +59,10 @@ export default function VehicleTypeChart({ messages }: VehicleTypeChartProps) {
             />
             <Tooltip
               cursor={{ fill: 'rgba(148,163,184,0.08)' }}
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: '1px solid #475569',
-                borderRadius: 8,
-              }}
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: 8 }}
               labelStyle={{ color: '#cbd5e1' }}
               itemStyle={{ color: '#94a3b8' }}
-              formatter={(value) => [value, 'Araç']}
+              formatter={(value) => [value, 'Tracks']}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {data.map(entry => (
@@ -80,5 +73,5 @@ export default function VehicleTypeChart({ messages }: VehicleTypeChartProps) {
         </ResponsiveContainer>
       </div>
     </div>
-  )
+  );
 }

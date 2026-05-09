@@ -1,32 +1,33 @@
-import { useEffect } from 'react'
-import type { TelemetryMessage } from '../types/TelemetryMessage'
+import { useEffect } from 'react';
+import { useActiveTracks } from '../store/selectors';
 
-interface Props {
-  message: TelemetryMessage | null
-  onClose: () => void
+interface VehicleDetailModalProps {
+  sensorId: string;
+  trackId: number | null;
+  onClose: () => void;
 }
 
-const CLASS_EMOJIS: Record<string, string> = {
-  car: '🚗',
-  truck: '🚚',
-  bus: '🚌',
-  motorcycle: '🏍️',
-  'semi-truck': '🚛',
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span className="text-slate-400">{label}</span>
+      <span className="text-white font-mono">{value}</span>
+    </div>
+  );
 }
 
-export default function VehicleDetailModal({ message, onClose }: Props) {
+export default function VehicleDetailModal({ sensorId, trackId, onClose }: VehicleDetailModalProps) {
+  const tracks = useActiveTracks(sensorId);
+  const track = trackId !== null ? (tracks.find(t => t.trackId === trackId) ?? null) : null;
+
   useEffect(() => {
-    if (!message) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [message, onClose])
+    if (trackId === null) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [trackId, onClose]);
 
-  if (!message) return null
-
-  const emoji = CLASS_EMOJIS[message.class] ?? '🚘'
+  if (trackId === null) return null;
 
   return (
     <div
@@ -44,45 +45,31 @@ export default function VehicleDetailModal({ message, onClose }: Props) {
           ✕
         </button>
 
-        <h2 className="text-xl font-bold text-white mb-4">
-          {emoji} {message.vehicleId}
-        </h2>
-
-        <div className="space-y-3 mb-6">
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-400">Track ID</span>
-            <span className="text-white font-mono">{message.trackId}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-400">Sınıf</span>
-            <span className="text-white">{emoji} {message.class}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-400">Hız</span>
-            <span className={`font-semibold ${message.speed > 120 ? 'text-red-400' : 'text-white'}`}>
-              {message.speed.toFixed(1)} km/h
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-400">Zaman</span>
-            <span className="text-white">{new Date(message.timestamp).toLocaleString('tr-TR')}</span>
-          </div>
-        </div>
-
-        <div className="rounded-lg overflow-hidden bg-slate-700">
-          {message.snapshotUrl ? (
-            <img
-              src={message.snapshotUrl}
-              alt="Araç görüntüsü"
-              className="w-full object-cover"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-40 text-slate-500 text-sm">
-              Görüntü henüz mevcut değil
+        {track ? (
+          <>
+            <h2 className="text-xl font-bold text-white mb-4">
+              🚘 Track #{track.trackId}
+            </h2>
+            <div className="space-y-3 mb-6">
+              <Row label="Vehicle Class" value={track.vehicleClass} />
+              <Row label="Confidence" value={`${(track.confidence * 100).toFixed(1)}%`} />
+              <Row label="BBox X" value={String(track.bbox[0])} />
+              <Row label="BBox Y" value={String(track.bbox[1])} />
+              <Row label="BBox Width" value={String(track.bbox[2])} />
+              <Row label="BBox Height" value={String(track.bbox[3])} />
+              <Row label="First Seen" value={new Date(track.firstSeenAt).toLocaleString()} />
+              <Row label="Last Seen" value={new Date(track.lastSeenAt).toLocaleString()} />
             </div>
-          )}
-        </div>
+            <div className="rounded-lg bg-slate-700 flex items-center justify-center h-40 text-slate-500 text-sm">
+              Snapshot unavailable
+            </div>
+          </>
+        ) : (
+          <p className="text-slate-400 text-sm">
+            Track #{trackId} is no longer active.
+          </p>
+        )}
       </div>
     </div>
-  )
+  );
 }

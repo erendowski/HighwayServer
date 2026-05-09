@@ -1,0 +1,28 @@
+# mediamtx.yml — MediaMTX configuration for Highway project
+# Docs: https://github.com/bluenviron/mediamtx
+
+logLevel: info
+logDestinations: [stdout]
+
+# API (for health/metrics — not exposed externally)
+api: yes
+apiAddress: :9997
+
+# WebRTC (WHEP for browser playback)
+webrtc: yes
+webrtcAddress: :8889
+
+# RTSP server (receives stream from Jetson)
+rtsp: yes
+rtspAddress: :8554
+
+# Paths
+paths:
+  cam1:
+    # Pull RTSP from Jetson over Tailscale.
+    # Replace with actual Jetson Tailscale IP at deployment.
+    source: rtsp://100.74.245.10:8554/stream
+    sourceProtocol: tcp
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 30s
