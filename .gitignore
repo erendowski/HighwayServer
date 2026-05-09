@@ -399,3 +399,14 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Environment variables - NEVER commit
+.env
+
+# Docker volumes
+influxdb-data/
+emqx-data/
+emqx-log/
+
+# mediamtx runtime
+mediamtx/*.pid
