@@ -24,8 +24,7 @@ paths:
     source: publisher
 
   highway:
-    # mediamtx Jetson'ın RTSP server'ından pull eder
-    # Jetson: udpsink host=127.0.0.1 → GstRtspServer → rtsp://jetson:8554/stream
-    # Browser: /whep/highway/whep  →  nginx  →  mediamtx:8889/highway/whep
+    # mediamtx Jetson'ın RTSP server'ından pull eder — TCP zorunlu (Tailscale'de UDP kayıp çok)
     source: rtsp://100.74.245.10:8554/stream
+    sourceProtocol: tcp
     sourceOnDemand: no
