@@ -105,6 +105,16 @@ try
     builder.Services.AddSingleton<InfluxService>();
     builder.Services.AddHostedService<SensorPruningService>();
 
+    // Anomaly detection
+    builder.Services.Configure<AnomalyThresholds>(
+        builder.Configuration.GetSection(AnomalyThresholds.Section));
+    builder.Services.AddSingleton<AnomalyDetector>();
+
+    // Stream status polling (mediamtx)
+    builder.Services.AddHttpClient("mediamtx");
+    builder.Services.AddSingleton<StreamStatusService>();
+    builder.Services.AddHostedService(sp => sp.GetRequiredService<StreamStatusService>());
+
     // CORS — wildcard in dev/no-origins; specific origins + credentials in production
     builder.Services.AddCors(opts => opts.AddDefaultPolicy(policy =>
     {

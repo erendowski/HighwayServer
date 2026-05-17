@@ -1,0 +1,22 @@
+[Unit]
+Description=Highway Vehicle Detection Stream
+# Tailscale bağlı değilse pipeline başlamasın — Tailscale IP'ye bağlanamaz
+After=network-online.target tailscaled.service
+Requires=tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jetson
+WorkingDirectory=/home/jetson/highway
+# Tailscale hazır mı kontrol et — hazır değilse servis başlamaz
+ExecStartPre=/usr/bin/tailscale status
+ExecStart=/usr/bin/python3 /home/jetson/highway/main.py --no-display
+Environment="RPI_TAILSCALE_IP=100.84.29.29"
+Restart=always
+RestartSec=5
+# Ortam değişkenlerini yükle
+EnvironmentFile=-/home/jetson/highway/.env
+
+[Install]
+WantedBy=multi-user.target

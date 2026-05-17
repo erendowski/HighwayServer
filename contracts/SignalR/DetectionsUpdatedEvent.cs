@@ -12,4 +12,5 @@ public sealed record DetectedObjectDto(
     string VehicleClass,
     float Confidence,
     int[] Bbox,
-    string TrackState);
+    string TrackState,
+    float? SpeedKmh);

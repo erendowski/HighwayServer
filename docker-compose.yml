@@ -79,11 +79,9 @@ services:
     environment:
       - EMQX_DASHBOARD__DEFAULT_USERNAME=${EMQX_DASHBOARD_USER}
       - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD_PASS}
-      - EMQX_AUTHENTICATION__1__MECHANISM=password_based
-      - EMQX_AUTHENTICATION__1__BACKEND=built_in_database
-      - EMQX_AUTHENTICATION__1__USER_ID_TYPE=username
-      - EMQX_AUTHENTICATION__1__PASSWORD_HASH_ALGORITHM__NAME=bcrypt
-      - EMQX_ALLOW_ANONYMOUS=${EMQX_ALLOW_ANONYMOUS:-false}
+      # Auth chain kapalı — tüm istemciler bağlanabilir (dev ortamı)
+      # Production'da buraya publishUser/publishPass ekle
+      - EMQX_ALLOW_ANONYMOUS=true
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
@@ -143,12 +141,14 @@ services:
     image: bluenviron/mediamtx:latest
     container_name: mediamtx
     restart: unless-stopped
-    ports:
-      - "8554:8554"
-      - "8889:8889"
-      - "8189:8189/udp"
+    environment:
+      - RPI_TAILSCALE_IP=${RPI_TAILSCALE_IP}
     volumes:
       - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "8554:8554"        # RTSP — Jetson buraya push eder
+      - "8889:8889"        # WebRTC WHEP HTTP
+      - "8189:8189/udp"    # WebRTC ICE UDP
     networks:
       - highway-net
     deploy:

@@ -15,6 +15,7 @@ export interface DetectedObject {
   confidence: number;
   bbox: [number, number, number, number]; // x, y, w, h
   trackState: 'active' | 'enter' | 'exit';
+  speedKmh?: number;
 }
 
 export interface DetectionsUpdatedPayload {
@@ -111,6 +112,62 @@ export interface SensorState {
   lastSeenAt: string;
   meta: SensorMetaPayload | null;
   lastStats: StatsPayload | null;
+}
+
+// ─── Anomaly types ────────────────────────────────────────────────────────────
+
+export type AnomalyType =
+  | 'STOPPED' | 'SLOW' | 'FAST' | 'EXTREME_FAST'
+  | 'SUDDEN_BRAKE' | 'SUDDEN_ACCEL' | 'WRONG_DIRECTION' | 'GHOST';
+
+export type AnomalySeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export interface Anomaly {
+  type: AnomalyType;
+  severity: AnomalySeverity;
+  speedKmh: number;
+  delta?: number;
+  detectedAt: number; // epoch ms
+}
+
+export interface AnomalyDetectedPayload {
+  sensorId: string;
+  trackId: number;
+  vehicleClass: string;
+  anomalyType: AnomalyType;
+  severity: AnomalySeverity;
+  speedKmh: number;
+  delta?: number;
+  confidence: number;
+  tsUtc: string;
+}
+
+// ─── Stream status types ──────────────────────────────────────────────────────
+
+export interface StreamStatusPayload {
+  ready: boolean;
+  path: string;
+  since: string;
+}
+
+// ─── Vehicle store types ──────────────────────────────────────────────────────
+
+export interface SpeedSample { t: number; v: number; }
+
+export type VehicleStatus = 'active' | 'stale' | 'lost';
+
+export interface VehicleState {
+  trackId: number;
+  sensorId: string;
+  classLabel: string;
+  speedKmh: number;
+  lastSpeedKmh: number;
+  bbox?: [number, number, number, number];
+  firstSeenAt: number;  // epoch ms
+  lastSeenAt: number;   // epoch ms
+  status: VehicleStatus;
+  speedHistory: SpeedSample[];
+  anomalies: Anomaly[];
 }
 
 // ─── REST API types ───────────────────────────────────────────────────────────

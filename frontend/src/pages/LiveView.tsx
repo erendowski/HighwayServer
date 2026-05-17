@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Car, Truck, Bus, Bike, Plane, Send, ArrowLeft } from 'lucide-react';
 import { useSensor, useActiveTracks } from '../store/selectors';
 import VideoPlayer from '../components/VideoPlayer';
 import MapView from '../components/MapView';
 import VehicleDetailModal from '../components/VehicleDetailModal';
 
-const CLASS_ICONS: Record<string, string> = {
-  car:        '🚗',
-  van:        '🚐',
-  bus:        '🚌',
-  motorcycle: '🏍️',
-  drone:      '🚁',
-  plane:      '✈️',
+const CLASS_ICONS: Record<string, React.ReactNode> = {
+  car:        <Car   size={24} />,
+  van:        <Truck size={24} />,
+  bus:        <Bus   size={24} />,
+  motorcycle: <Bike  size={24} />,
+  drone:      <Send  size={24} />,
+  plane:      <Plane size={24} />,
 };
 
 const CLASS_COLORS: Record<string, string> = {
@@ -53,9 +54,10 @@ export default function LiveView() {
       <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={() => navigate('/')}
-          className="text-sm text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-colors"
         >
-          ← Geri
+          <ArrowLeft size={14} />
+          Geri
         </button>
         <h1 className="text-lg font-semibold text-white">
           Canlı İzleme — <span className="font-mono">{sensorId}</span>
@@ -77,12 +79,10 @@ export default function LiveView() {
         />
       </div>
 
-      {/* Tespit edilen araçlar — tıklayınca haritada göster */}
-      <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-          <h2 className="text-sm font-semibold text-slate-300">
-            Tespit Edilen Araçlar
-          </h2>
+      {/* Tespit edilen araçlar */}
+      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/60">
+          <h2 className="text-sm font-semibold text-white">Tespit Edilen Araçlar</h2>
           <span className="text-xs text-slate-400">{tracks.length} aktif</span>
         </div>
 
@@ -108,8 +108,8 @@ export default function LiveView() {
                     ${isSelected ? 'ring-2 ring-white/40 scale-105' : 'hover:scale-105'}
                   `}
                 >
-                  <span className="text-2xl">
-                    {CLASS_ICONS[track.vehicleClass] ?? '🚘'}
+                  <span className="text-slate-200">
+                    {CLASS_ICONS[track.vehicleClass] ?? <Car size={24} />}
                   </span>
                   <span className="text-xs font-mono text-white font-semibold">
                     #{track.trackId}
@@ -130,11 +130,11 @@ export default function LiveView() {
         )}
 
         {selectedTrackId !== null && (
-          <div className="px-4 py-2 border-t border-slate-700 text-xs text-slate-400 flex items-center justify-between">
-            <span>Track #{selectedTrackId} seçili — harita konumuna gidildi</span>
+          <div className="px-4 py-2 border-t border-slate-700/60 text-xs text-slate-400 flex items-center justify-between">
+            <span>Track #{selectedTrackId} seçili</span>
             <div className="flex gap-2">
               <button
-                onClick={() => { setModalOpen(true); }}
+                onClick={() => setModalOpen(true)}
                 className="text-sky-400 hover:text-sky-300 transition-colors"
               >
                 Detay
@@ -150,7 +150,6 @@ export default function LiveView() {
         )}
       </div>
 
-      {/* Araç detay modal (Detay butonuna basınca) */}
       {modalOpen && (
         <VehicleDetailModal
           sensorId={sensorId}
@@ -158,7 +157,6 @@ export default function LiveView() {
           onClose={() => setModalOpen(false)}
         />
       )}
-
     </div>
   );
 }

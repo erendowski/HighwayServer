@@ -1,13 +1,30 @@
+import { useEffect, useState } from 'react'
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
+import { Sun, Moon } from 'lucide-react'
 import Dashboard from './pages/Dashboard'
 import LiveView from './pages/LiveView'
 import { useSignalRConnection } from './hooks/useSignalRConnection'
 import { useSensorsStore } from './store/sensorsStore'
 
+function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }, [dark]);
+
+  return [dark, setDark] as const;
+}
+
 export default function App() {
   const { connected, error } = useSignalRConnection()
+  const [dark, setDark] = useDarkMode()
 
-  // İlk online sensörü bul; yoksa listedeki ilk sensörü; yoksa 'jetson01' varsayılanı
   const liveSensorId = useSensorsStore(s => {
     const list = Object.values(s.sensors);
     return (list.find(x => x.status === 'online') ?? list[0])?.sensorId ?? 'jetson01';
@@ -15,7 +32,7 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-950 text-white">
-      <div style={{ position: 'fixed', top: 8, right: 12, fontSize: 11, color: connected ? 'lime' : 'red', zIndex: 9999 }}>
+      <div style={{ position: 'fixed', top: 8, right: 48, fontSize: 11, color: connected ? 'lime' : 'red', zIndex: 9999 }}>
         {connected ? '● Live' : error ? '✕ Error' : '○ Connecting...'}
       </div>
 
@@ -48,6 +65,14 @@ export default function App() {
         >
           Canlı İzleme
         </NavLink>
+
+        <button
+          onClick={() => setDark(d => !d)}
+          className="ml-auto p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          title={dark ? 'Light mode' : 'Dark mode'}
+        >
+          {dark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
       </nav>
 
       <main className="flex-1 min-h-0 overflow-y-auto p-4">

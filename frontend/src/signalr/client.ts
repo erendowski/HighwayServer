@@ -4,6 +4,9 @@ import { useTracksStore } from '../store/tracksStore';
 import { useDetectionsStore } from '../store/detectionsStore';
 import { useEventsStore } from '../store/eventsStore';
 import { useConnectionStore } from '../store/connectionStore';
+import { useVehicleStore } from '../store/vehicleStore';
+import { useAnomalyStore } from '../store/anomalyStore';
+import { useStreamStore } from '../store/streamStore';
 import type {
   SensorState,
   SensorStatusPayload,
@@ -13,6 +16,8 @@ import type {
   VehicleEventPayload,
   CommandResponsePayload,
   HeartbeatPayload,
+  AnomalyDetectedPayload,
+  StreamStatusPayload,
 } from '../types/contracts';
 
 const HUB_URL = `${import.meta.env.VITE_API_URL ?? ''}/telemetryHub`;
@@ -54,17 +59,29 @@ export function getConnection(): signalR.HubConnection {
 
   _connection.on('DetectionsUpdated', (p: DetectionsUpdatedPayload) => {
     detections.updateDetections(p);
+
+    const vehicles = useVehicleStore.getState();
     p.objects.forEach(obj => {
+      // Update legacy tracks store (map, table display)
       tracks.upsertTrack({
-        sensorId:    p.sensorId,
-        trackId:     obj.trackId,
+        sensorId:     p.sensorId,
+        trackId:      obj.trackId,
         vehicleClass: obj.vehicleClass,
-        confidence:  obj.confidence,
-        bbox:        obj.bbox,
-        firstSeenAt: p.tsUtc,
-        lastSeenAt:  p.tsUtc,
-        trackState:  obj.trackState,
+        confidence:   obj.confidence,
+        bbox:         obj.bbox,
+        firstSeenAt:  p.tsUtc,
+        lastSeenAt:   p.tsUtc,
+        trackState:   obj.trackState,
       });
+
+      // Update rich vehicle store (speed history, anomalies, status)
+      if (obj.speedKmh !== undefined) {
+        vehicles.upsertVehicle(p.sensorId, obj.trackId, {
+          classLabel: obj.vehicleClass,
+          speedKmh:   obj.speedKmh,
+          bbox:       obj.bbox,
+        });
+      }
     });
   });
 
@@ -83,6 +100,26 @@ export function getConnection(): signalR.HubConnection {
 
   _connection.on('CommandResponseReceived', (p: CommandResponsePayload) => {
     events.addCommandResponse(p);
+  });
+
+  // ── New events ──────────────────────────────────────────────────────────────
+
+  _connection.on('anomalydetected', (p: AnomalyDetectedPayload) => {
+    // Add to global feed
+    useAnomalyStore.getState().addAnomaly(p);
+
+    // Also push into vehicle's own anomaly list
+    useVehicleStore.getState().addAnomaly(p.sensorId, p.trackId, {
+      type:        p.anomalyType,
+      severity:    p.severity,
+      speedKmh:    p.speedKmh,
+      delta:       p.delta,
+      detectedAt:  Date.now(),
+    });
+  });
+
+  _connection.on('streamstatuschanged', (p: StreamStatusPayload) => {
+    useStreamStore.getState().setStatus(p.ready, p.path, p.since);
   });
 
   // ── Connection state logging ────────────────────────────────────────────────

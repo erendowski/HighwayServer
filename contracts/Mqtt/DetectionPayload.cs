@@ -18,6 +18,9 @@ public sealed record DetectedObject
 
     [JsonPropertyName("track_state")]
     public string TrackState { get; init; } = string.Empty;
+
+    [JsonPropertyName("speed_kmh")]
+    public float? SpeedKmh { get; init; }
 }
 
 public sealed record DetectionPayload : BasePayload

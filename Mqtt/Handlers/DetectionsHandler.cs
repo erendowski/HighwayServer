@@ -14,9 +14,10 @@ public sealed class DetectionsHandler : IMqttMessageHandler
         new() { PropertyNameCaseInsensitive = true };
 
     private readonly SensorStateStore _sensorStore;
-    private readonly TrackStateStore _trackStore;
+    private readonly TrackStateStore  _trackStore;
     private readonly IHubContext<TelemetryHub> _hub;
-    private readonly InfluxService _influx;
+    private readonly InfluxService    _influx;
+    private readonly AnomalyDetector  _anomalyDetector;
     private readonly ILogger<DetectionsHandler> _logger;
 
     // Per-sensor last-broadcast timestamp for SignalR rate limiting (max 10 Hz).
@@ -25,17 +26,19 @@ public sealed class DetectionsHandler : IMqttMessageHandler
     public string TopicPattern => "highway/telemetry/+/detections";
 
     public DetectionsHandler(
-        SensorStateStore sensorStore,
-        TrackStateStore trackStore,
+        SensorStateStore          sensorStore,
+        TrackStateStore           trackStore,
         IHubContext<TelemetryHub> hub,
-        InfluxService influx,
+        InfluxService             influx,
+        AnomalyDetector           anomalyDetector,
         ILogger<DetectionsHandler> logger)
     {
-        _sensorStore = sensorStore;
-        _trackStore  = trackStore;
-        _hub         = hub;
-        _influx      = influx;
-        _logger      = logger;
+        _sensorStore     = sensorStore;
+        _trackStore      = trackStore;
+        _hub             = hub;
+        _influx          = influx;
+        _anomalyDetector = anomalyDetector;
+        _logger          = logger;
     }
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken ct)
@@ -58,7 +61,8 @@ public sealed class DetectionsHandler : IMqttMessageHandler
             (now - last).TotalMilliseconds >= 100)
         {
             var dtos = data.Objects
-                .Select(o => new DetectedObjectDto(o.TrackId, o.Class, o.Confidence, o.Bbox, o.TrackState))
+                .Select(o => new DetectedObjectDto(
+                    o.TrackId, o.Class, o.Confidence, o.Bbox, o.TrackState, o.SpeedKmh))
                 .ToArray();
 
             await _hub.Clients.All.SendAsync(
@@ -69,8 +73,14 @@ public sealed class DetectionsHandler : IMqttMessageHandler
             _lastBroadcast[data.SensorId] = now;
         }
 
-        // InfluxDB write — NOT rate-limited, one call per detected object.
+        // Anomaly detection + InfluxDB — one call per detected object.
         foreach (var obj in data.Objects)
+        {
             await _influx.WriteDetectionAsync(data.SensorId, obj, data.FrameId, data.TsUtc);
+
+            if (obj.SpeedKmh.HasValue)
+                await _anomalyDetector.EvaluateAsync(
+                    data.SensorId, obj.TrackId, obj.Class, obj.SpeedKmh.Value, data.TsUtc, ct);
+        }
     }
 }

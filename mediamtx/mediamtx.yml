@@ -1,28 +1,30 @@
-# mediamtx.yml — MediaMTX configuration for Highway project
+# mediamtx.yml — MediaMTX v1.x — Highway project
 # Docs: https://github.com/bluenviron/mediamtx
 
 logLevel: info
 logDestinations: [stdout]
 
-# API (for health/metrics — not exposed externally)
 api: yes
 apiAddress: :9997
 
-# WebRTC (WHEP for browser playback)
-webrtc: yes
-webrtcAddress: :8889
-
-# RTSP server (receives stream from Jetson)
+# ── RTSP — Jetson buraya push eder ───────────────────────────────────────────
 rtsp: yes
 rtspAddress: :8554
 
-# Paths
+# ── WebRTC / WHEP — browser buradan çeker ────────────────────────────────────
+webrtc: yes
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+webrtcAdditionalHosts:
+  - 100.84.29.29   # RPi5 Tailscale IP — sabit, LAN IP ekleme
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
   cam1:
-    # Pull RTSP from Jetson over Tailscale.
-    # Replace with actual Jetson Tailscale IP at deployment.
-    source: rtsp://100.74.245.10:8554/stream
-    sourceProtocol: tcp
-    sourceOnDemand: yes
-    sourceOnDemandStartTimeout: 10s
-    sourceOnDemandCloseAfter: 30s
+    source: publisher
+    # TODO: production'da publishUser/publishPass ekle
+
+  highway:
+    source: publisher
+    # Jetson RTSP publish: rtsp://<server>:8554/highway
+    # Browser WHEP consume: http://<server>:8889/highway/whep (via nginx /whep/highway/whep)

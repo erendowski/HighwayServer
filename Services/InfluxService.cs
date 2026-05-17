@@ -107,6 +107,36 @@ public sealed class InfluxService
         }
     }
 
+    public async Task WriteAnomalyAsync(
+        string sensorId, int trackId, string vehicleClass,
+        string anomalyType, string severity, float speedKmh, float? delta, DateTimeOffset ts)
+    {
+        try
+        {
+            var api   = _client.GetWriteApiAsync();
+            var point = PointData.Measurement("anomalies")
+                .Tag("sensor_id",    sensorId)
+                .Tag("track_id",     trackId.ToString())
+                .Tag("type",         anomalyType)
+                .Tag("severity",     severity)
+                .Tag("class",        vehicleClass)
+                .Field("speed_kmh",  (double)speedKmh)
+                .Field("confidence", 1.0);
+
+            if (delta.HasValue)
+                point = point.Field("delta", (double)delta.Value);
+
+            point = point.Timestamp(ts.UtcDateTime, WritePrecision.Ms);
+            await api.WritePointAsync(point, _opts.Bucket, _opts.Org);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to write anomaly for sensor={SensorId} track={TrackId} type={Type}",
+                sensorId, trackId, anomalyType);
+        }
+    }
+
     public async Task WriteSensorHealthAsync(string sensorId, bool alive, DateTimeOffset ts)
     {
         try
