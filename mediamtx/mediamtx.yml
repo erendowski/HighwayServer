@@ -22,9 +22,10 @@ webrtcAdditionalHosts:
 paths:
   cam1:
     source: publisher
-    # TODO: production'da publishUser/publishPass ekle
 
   highway:
-    source: publisher
-    # Jetson RTSP publish: rtsp://<server>:8554/highway
-    # Browser WHEP consume: http://<server>:8889/highway/whep (via nginx /whep/highway/whep)
+    # mediamtx Jetson'ın RTSP server'ından pull eder
+    # Jetson: udpsink host=127.0.0.1 → GstRtspServer → rtsp://jetson:8554/stream
+    # Browser: /whep/highway/whep  →  nginx  →  mediamtx:8889/highway/whep
+    source: rtsp://100.74.245.10:8554/stream
+    sourceOnDemand: no
