@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Radio, Video, VideoOff } from 'lucide-react';
-import { useStreamStore } from '../store/streamStore';
 
 const BASE_URL    = import.meta.env.VITE_API_URL ?? '';
 const WHEP_URL    = `${BASE_URL}/whep/highway/whep`;
@@ -14,7 +13,6 @@ export default function VideoPlayer() {
   const timerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [state, setState] = useState<ConnState>('idle');
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
-  const streamReady = useStreamStore(s => s.ready);
 
   const stopPc = useCallback(() => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
@@ -84,17 +82,11 @@ export default function VideoPlayer() {
     }
   }, [stopPc]);
 
-  // Connect / disconnect based on stream readiness
+  // Her zaman bağlanmayı dene — WHEP 404/error verirse idle'a düş, 5s sonra tekrar dene
   useEffect(() => {
-    if (streamReady) {
-      connect();
-    } else {
-      stopPc();
-      setState('idle');
-      setLatencyMs(null);
-    }
+    connect();
     return stopPc;
-  }, [streamReady, connect, stopPc]);
+  }, [connect, stopPc]);
 
   return (
     <div className="flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
