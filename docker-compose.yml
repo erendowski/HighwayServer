@@ -18,8 +18,6 @@ services:
       - Mqtt__Host=emqx
       - Mqtt__Port=1883
       - Mqtt__ClientId=HighwayServer
-      - Mqtt__Username=${EMQX_SERVER_USER}
-      - Mqtt__Password=${EMQX_SERVER_PASS}
       - InfluxDb__Url=http://influxdb:8086
       - InfluxDb__Token=${INFLUXDB_TOKEN}
       - InfluxDb__Org=${INFLUXDB_ORG}
@@ -54,7 +52,7 @@ services:
     networks:
       - highway-net
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -79,9 +77,8 @@ services:
     environment:
       - EMQX_DASHBOARD__DEFAULT_USERNAME=${EMQX_DASHBOARD_USER}
       - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD_PASS}
-      # Auth chain kapalı — tüm istemciler bağlanabilir (dev ortamı)
-      # Production'da buraya publishUser/publishPass ekle
       - EMQX_ALLOW_ANONYMOUS=true
+      # Authentication chain yok — tüm clientlar (credentials gönderse de göndermese de) bağlanır
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
