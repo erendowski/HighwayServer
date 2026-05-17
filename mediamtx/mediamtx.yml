@@ -16,7 +16,8 @@ webrtc: yes
 webrtcAddress: :8889
 webrtcLocalUDPAddress: :8189
 webrtcAdditionalHosts:
-  - 100.84.29.29   # RPi5 Tailscale IP — sabit, LAN IP ekleme
+  - 100.84.29.29   # RPi5 Tailscale IP
+  - 192.168.0.17   # RPi5 LAN IP
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
