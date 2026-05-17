@@ -24,7 +24,5 @@ paths:
     source: publisher
 
   highway:
-    # mediamtx Jetson'ın RTSP server'ından pull eder — TCP zorunlu (Tailscale'de UDP kayıp çok)
-    source: rtsp://100.74.245.10:8554/stream
-    sourceProtocol: tcp
-    sourceOnDemand: no
+    # Jetson rtspclientsink ile TCP üzerinden push eder
+    source: publisher
