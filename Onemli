@@ -52,3 +52,18 @@ VideoPlayer, /whep/cam1/whep çağırdı; Nginx bunu MediaMTX’e iletti; MediaM
 Sonuç
 Akış: Jetson RTSP (/stream) → RPi MediaMTX (cam1) → Nginx /whep → Browser (WebRTC)
 ve dashboard’da canlı görüntü açıldı.
+
+
+
+
+Her şey çalışıyor! Özet:
+
+Frontend: https://yhnt.vercel.app (Vercel)
+Backend: https://rap-lesser-baker-deposit.trycloudflare.com (Cloudflare Quick Tunnel)
+SignalR: Bağlı
+Hatırlatma: Quick Tunnel URL'i RPi5'te docker compose restart cloudflared yapınca değişir. Değişirse:
+
+docker logs highway-cloudflared 2>&1 | grep trycloudflare ile yeni URL'i al
+Vercel'de Settings → Environment Variables → VITE_API_URL güncelle
+Redeploy yap
+Kalıcı URL için ileride ucuz bir domain alıp Cloudflare'e bağlayabiliriz.

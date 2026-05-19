@@ -1,0 +1,21 @@
+URL ne zaman değişir:
+
+RPi5 yeniden başlatılınca
+docker compose restart cloudflared veya docker compose down/up yapılınca
+Cloudflare tarafında bağlantı kopup yeniden kurulunca (nadiren)
+docker compose restart highwayserver veya diğer container'ları yeniden başlatınca URL değişmez — sadece cloudflared container'ı yeniden başlayınca değişir.
+
+URL değiştiğinde yapılacaklar:
+
+1 — Yeni URL'i öğren (RPi5'te):
+
+
+docker logs highway-cloudflared 2>&1 | grep trycloudflare
+2 — Vercel'de güncelle:
+
+vercel.com → HighwayServer projesi → Settings → Environment Variables
+VITE_API_URL değerini yeni URL ile güncelle → Save
+3 — Redeploy:
+
+Deployments sekmesi → en üstteki deployment → ... → Redeploy
+Redeploy ~1 dakika sürer, sonra yhnt.vercel.app tekrar çalışır.
