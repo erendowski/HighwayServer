@@ -146,6 +146,7 @@ services:
       - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
     ports:
       - "8554:8554"        # RTSP — Jetson buraya push eder
+      - "8888:8888"        # HLS / MJPEG HTTP
       - "8889:8889"        # WebRTC WHEP HTTP
       - "8189:8189/udp"    # WebRTC ICE UDP
     networks:

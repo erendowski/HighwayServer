@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Radio, Video, VideoOff } from 'lucide-react';
 
 const BASE_URL  = import.meta.env.VITE_API_URL ?? '';
-const MJPEG_URL = `${BASE_URL}/mjpeg/highway/mjpeg`;
+const MJPEG_URL = `${BASE_URL}/mjpeg/highway/mjpeg/`;
 
 type ConnState = 'connecting' | 'playing' | 'error';
 

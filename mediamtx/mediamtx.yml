@@ -19,9 +19,11 @@ webrtcAdditionalHosts:
   - 100.84.29.29   # RPi5 Tailscale IP
   - 192.168.0.17   # RPi5 LAN IP
 
-# ── MJPEG — MediaMTX her path için otomatik sunar ────────────────────────────
-# Endpoint: http://<host>:8889/<path>/mjpeg
-# nginx /mjpeg/ → mediamtx:8889/ olarak proxy'leniyor
+# ── HLS/MJPEG — port 8888 üzerinden ─────────────────────────────────────────
+# MJPEG endpoint: http://<host>:8888/<path>/mjpeg
+hls: yes
+hlsAddress: :8888
+hlsAllowOrigin: "*"
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
@@ -29,5 +31,6 @@ paths:
     source: publisher
 
   highway:
-    # Jetson rtspclientsink ile TCP üzerinden push eder
-    source: publisher
+    # MediaMTX Jetson'ın RTSP stream'ini çeker → MJPEG olarak sunar
+    source: rtsp://100.74.245.10:8554/stream
+    sourceProtocol: tcp
