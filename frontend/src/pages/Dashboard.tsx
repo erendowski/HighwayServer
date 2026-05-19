@@ -79,13 +79,15 @@ export default function Dashboard() {
         <div className="xl:col-span-8">
           <VideoPlayer />
         </div>
-        <div className="xl:col-span-4 flex flex-col">
-          <ActiveTracksPanel sensorId={sensorId} className="flex-1" />
+        <div className="xl:col-span-4 h-96">
+          <ActiveTracksPanel sensorId={sensorId} className="h-full" />
         </div>
       </div>
 
       {/* Anomaly Feed */}
-      <AnomalyFeed />
+      <div className="h-96">
+        <AnomalyFeed className="h-full" />
+      </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
