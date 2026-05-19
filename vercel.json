@@ -1,9 +1,6 @@
 {
-  "buildCommand": "cd frontend && npm run build",
+  "buildCommand": "cd frontend && VITE_OUT_DIR=dist npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "cd frontend && npm install",
-  "env": {
-    "VITE_OUT_DIR": "dist"
-  },
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
