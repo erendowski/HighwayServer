@@ -7,11 +7,25 @@ const RETRY_MS  = 4_000;
 
 type ConnState = 'connecting' | 'playing' | 'error';
 
+const SOI = new Uint8Array([0xff, 0xd8]);
+const EOI = new Uint8Array([0xff, 0xd9]);
+
+function indexOf(haystack: Uint8Array, needle: Uint8Array, from = 0): number {
+  outer: for (let i = from; i <= haystack.length - needle.length; i++) {
+    for (let j = 0; j < needle.length; j++) {
+      if (haystack[i + j] !== needle[j]) continue outer;
+    }
+    return i;
+  }
+  return -1;
+}
+
 export default function VideoPlayer() {
   const canvasRef         = useRef<HTMLCanvasElement>(null);
   const [state, setState] = useState<ConnState>('connecting');
   const abortRef          = useRef<AbortController | null>(null);
   const retryRef          = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const drawingRef        = useRef(false);
 
   const clearRetry = () => {
     if (retryRef.current) { clearTimeout(retryRef.current); retryRef.current = null; }
@@ -23,6 +37,7 @@ export default function VideoPlayer() {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setState('connecting');
+    drawingRef.current = false;
 
     try {
       const res = await fetch(MJPEG_URL, { signal: ctrl.signal });
@@ -32,29 +47,35 @@ export default function VideoPlayer() {
       let buf = new Uint8Array(0);
       let firstFrame = true;
 
-      const indexOf = (haystack: Uint8Array, needle: Uint8Array, from = 0): number => {
-        outer: for (let i = from; i <= haystack.length - needle.length; i++) {
-          for (let j = 0; j < needle.length; j++) {
-            if (haystack[i + j] !== needle[j]) continue outer;
-          }
-          return i;
-        }
-        return -1;
-      };
+      // pending frame — yeni kare gelince eskisini drop et
+      let pendingBitmap: ImageBitmap | null = null;
 
-      const SOI = new Uint8Array([0xff, 0xd8]);
-      const EOI = new Uint8Array([0xff, 0xd9]);
+      const drawLoop = () => {
+        if (ctrl.signal.aborted) return;
+        if (pendingBitmap) {
+          const canvas = canvasRef.current;
+          if (canvas) {
+            if (canvas.width !== pendingBitmap.width)  canvas.width  = pendingBitmap.width;
+            if (canvas.height !== pendingBitmap.height) canvas.height = pendingBitmap.height;
+            canvas.getContext('2d')?.drawImage(pendingBitmap, 0, 0);
+          }
+          pendingBitmap.close();
+          pendingBitmap = null;
+        }
+        requestAnimationFrame(drawLoop);
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
+        // append chunk
         const merged = new Uint8Array(buf.length + value.length);
         merged.set(buf);
         merged.set(value, buf.length);
         buf = merged;
 
-        // extract all complete JPEG frames from buffer
+        // extract all complete JPEG frames, keep only the latest
         let soiIdx: number;
         while ((soiIdx = indexOf(buf, SOI)) !== -1) {
           const eoiIdx = indexOf(buf, EOI, soiIdx + 2);
@@ -63,28 +84,24 @@ export default function VideoPlayer() {
           const jpeg = buf.slice(soiIdx, eoiIdx + 2);
           buf = buf.slice(eoiIdx + 2);
 
-          const blob = new Blob([jpeg], { type: 'image/jpeg' });
-          const url  = URL.createObjectURL(blob);
-          const img  = new Image();
+          // drop pending frame if decode is behind
+          if (pendingBitmap) { pendingBitmap.close(); pendingBitmap = null; }
 
-          await new Promise<void>((resolve) => {
-            img.onload = () => {
-              const canvas = canvasRef.current;
-              if (canvas) {
-                canvas.width  = img.width;
-                canvas.height = img.height;
-                canvas.getContext('2d')?.drawImage(img, 0, 0);
-              }
-              URL.revokeObjectURL(url);
-              if (firstFrame) { setState('playing'); firstFrame = false; }
-              resolve();
-            };
-            img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
-            img.src = url;
-          });
+          try {
+            const blob = new Blob([jpeg], { type: 'image/jpeg' });
+            pendingBitmap = await createImageBitmap(blob);
+          } catch {
+            // corrupt frame — skip
+          }
+
+          if (firstFrame) {
+            setState('playing');
+            firstFrame = false;
+            requestAnimationFrame(drawLoop);
+          }
         }
 
-        // prevent unbounded buffer growth (keep last 512KB)
+        // prevent unbounded buffer growth
         if (buf.length > 512 * 1024) {
           const soiLast = indexOf(buf, SOI, buf.length - 256 * 1024);
           if (soiLast > 0) buf = buf.slice(soiLast);
@@ -107,7 +124,6 @@ export default function VideoPlayer() {
 
   return (
     <div className="flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700/60 shrink-0">
         <div className="flex items-center gap-2">
           <Video size={20} className="text-sky-400" />
@@ -125,12 +141,8 @@ export default function VideoPlayer() {
         </span>
       </div>
 
-      {/* Video area */}
       <div className="relative bg-black aspect-video">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full object-contain"
-        />
+        <canvas ref={canvasRef} className="w-full h-full object-contain" />
 
         {state !== 'playing' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
