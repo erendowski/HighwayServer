@@ -8,8 +8,6 @@ const SENSOR_ID = 'jetson01'
 const NOW = new Date().toISOString()
 
 const CLASSES = ['car', 'truck', 'bus', 'motorcycle', 'van']
-const ANOMALY_TYPES = ['STOPPED_VEHICLE', 'UNDERSPEED', 'OVERSPEED', 'SUDDEN_BRAKE', 'WRONG_WAY'] as const
-const SEVERITIES    = ['low', 'medium', 'high', 'critical'] as const
 
 function rand(min: number, max: number) {
   return Math.random() * (max - min) + min
