@@ -8,15 +8,14 @@ interface VehicleTypeChartProps {
   sensorId: string;
 }
 
-const VEHICLE_CLASSES = ['car', 'van', 'bus', 'motorcycle', 'drone', 'plane'] as const;
+const VEHICLE_CLASSES = ['car', 'van', 'truck', 'bus', 'motorcycle'] as const;
 
 const BAR_COLORS: Record<string, string> = {
-  car: '#38bdf8',
-  van: '#3b82f6',
-  bus: '#4ade80',
+  car:        '#38bdf8',
+  van:        '#3b82f6',
+  truck:      '#60a5fa',
+  bus:        '#4ade80',
   motorcycle: '#c084fc',
-  drone: '#a855f7',
-  plane: '#06b6d4',
 };
 
 export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {

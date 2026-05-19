@@ -123,7 +123,7 @@ export default function VideoPlayer() {
   }, [connect]);
 
   return (
-    <div className="flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
+    <div className="h-full flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700/60 shrink-0">
         <div className="flex items-center gap-2">
           <Video size={20} className="text-sky-400" />
@@ -141,7 +141,7 @@ export default function VideoPlayer() {
         </span>
       </div>
 
-      <div className="relative bg-black aspect-video">
+      <div className="relative bg-black flex-1 min-h-0">
         <canvas ref={canvasRef} className="w-full h-full object-contain" />
 
         {state !== 'playing' && (
