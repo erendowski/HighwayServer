@@ -84,6 +84,7 @@ try
     builder.Services.AddSingleton<IMqttMessageHandler, VehicleEnterHandler>();
     builder.Services.AddSingleton<IMqttMessageHandler, VehicleExitHandler>();
     builder.Services.AddSingleton<IMqttMessageHandler, CommandResponseHandler>();
+    builder.Services.AddSingleton<IMqttMessageHandler, AnomalyHandler>();
 
     // Router — receives every message and dispatches to the correct handler
     builder.Services.AddSingleton<MqttTopicRouter>();
@@ -104,11 +105,6 @@ try
     // Application services
     builder.Services.AddSingleton<InfluxService>();
     builder.Services.AddHostedService<SensorPruningService>();
-
-    // Anomaly detection
-    builder.Services.Configure<AnomalyThresholds>(
-        builder.Configuration.GetSection(AnomalyThresholds.Section));
-    builder.Services.AddSingleton<AnomalyDetector>();
 
     // Stream status polling (mediamtx)
     builder.Services.AddHttpClient("mediamtx");

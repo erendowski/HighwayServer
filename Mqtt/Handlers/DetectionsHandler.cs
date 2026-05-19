@@ -17,7 +17,6 @@ public sealed class DetectionsHandler : IMqttMessageHandler
     private readonly TrackStateStore  _trackStore;
     private readonly IHubContext<TelemetryHub> _hub;
     private readonly InfluxService    _influx;
-    private readonly AnomalyDetector  _anomalyDetector;
     private readonly ILogger<DetectionsHandler> _logger;
 
     // Per-sensor last-broadcast timestamp for SignalR rate limiting (max 10 Hz).
@@ -30,15 +29,13 @@ public sealed class DetectionsHandler : IMqttMessageHandler
         TrackStateStore           trackStore,
         IHubContext<TelemetryHub> hub,
         InfluxService             influx,
-        AnomalyDetector           anomalyDetector,
         ILogger<DetectionsHandler> logger)
     {
-        _sensorStore     = sensorStore;
-        _trackStore      = trackStore;
-        _hub             = hub;
-        _influx          = influx;
-        _anomalyDetector = anomalyDetector;
-        _logger          = logger;
+        _sensorStore = sensorStore;
+        _trackStore  = trackStore;
+        _hub         = hub;
+        _influx      = influx;
+        _logger      = logger;
     }
 
     public async Task HandleAsync(string topic, ReadOnlyMemory<byte> payload, CancellationToken ct)
@@ -73,14 +70,7 @@ public sealed class DetectionsHandler : IMqttMessageHandler
             _lastBroadcast[data.SensorId] = now;
         }
 
-        // Anomaly detection + InfluxDB — one call per detected object.
         foreach (var obj in data.Objects)
-        {
             await _influx.WriteDetectionAsync(data.SensorId, obj, data.FrameId, data.TsUtc);
-
-            if (obj.SpeedKmh.HasValue)
-                await _anomalyDetector.EvaluateAsync(
-                    data.SensorId, obj.TrackId, obj.Class, obj.SpeedKmh.Value, data.TsUtc, ct);
-        }
     }
 }

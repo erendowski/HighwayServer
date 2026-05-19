@@ -11,7 +11,7 @@ User=jetson
 WorkingDirectory=/home/jetson/highway
 # Tailscale hazır mı kontrol et — hazır değilse servis başlamaz
 ExecStartPre=/usr/bin/tailscale status
-ExecStart=/usr/bin/python3 /home/jetson/highway/main.py --no-display
+ExecStart=/usr/bin/python3 /home/jetson/highway/highway_detection.py --no-display
 Environment="RPI_TAILSCALE_IP=100.84.29.29"
 Restart=always
 RestartSec=5
