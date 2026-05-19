@@ -39,9 +39,10 @@ public sealed class MqttClientService : BackgroundService, IMqttClientService
         _mqttClient.ApplicationMessageReceivedAsync += e =>
         {
             var topic = e.ApplicationMessage.Topic;
-            // Copy payload to a stable buffer before handing off to Task.Run.
-            Memory<byte> mem = e.ApplicationMessage.PayloadSegment;
-            ReadOnlyMemory<byte> payload = mem;
+            // MQTTnet pooled buffer'ı geri alıyor — Task.Run'a vermeden ÖNCE kopyala.
+            // Aksi halde async handler çalıştığında payload bozuk olur, JSON parse fail eder
+            // ve telemetri sessizce düşer.
+            ReadOnlyMemory<byte> payload = e.ApplicationMessage.PayloadSegment.ToArray();
 
             _ = Task.Run(async () =>
             {
