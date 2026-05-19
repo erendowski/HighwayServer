@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import {
-  Car, Truck, Bus, Bike, Plane, Send,
+  Car, Truck, Bus, Bike,
   Activity, CircleDot, CircleOff,
   AlertTriangle,
 } from 'lucide-react';
@@ -11,12 +11,11 @@ import { SEVERITY_BADGE } from '../lib/anomalyImpact';
 // ── Icon helpers ─────────────────────────────────────────────────────────────
 
 const CLASS_ICONS: Record<string, React.ReactNode> = {
-  car:        <Car        size={16} />,
-  van:        <Truck      size={16} />,
-  bus:        <Bus        size={16} />,
-  motorcycle: <Bike       size={16} />,
-  plane:      <Plane      size={16} />,
-  drone:      <Send       size={16} />,
+  car:        <Car   size={16} />,
+  van:        <Truck size={16} />,
+  bus:        <Bus   size={16} />,
+  motorcycle: <Bike  size={16} />,
+  truck:      <Truck size={16} />,
 };
 
 const STATUS_ICON: Record<VehicleStatus, React.ReactNode> = {

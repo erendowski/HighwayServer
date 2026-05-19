@@ -5,7 +5,6 @@ const SPEED_HISTORY_MS = 30_000;
 const MAX_ANOMALIES    = 5;
 const STALE_MS         = 3_000;
 const LOST_MS          = 15_000;
-const REMOVE_MS        = 60_000;
 
 interface VehicleStoreState {
   // sensorId → trackId → VehicleState
@@ -84,7 +83,6 @@ export const useVehicleStore = create<VehicleStoreState>((set) => ({
       for (const [idStr, v] of Object.entries(sensor)) {
         const id  = Number(idStr);
         const age = now - v.lastSeenAt;
-        if (age > REMOVE_MS) continue;
 
         let status: VehicleStatus = 'active';
         if (age > LOST_MS)       status = 'lost';

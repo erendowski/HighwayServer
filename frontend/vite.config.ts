@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
-      outDir: '../wwwroot',
+      outDir: env.VITE_OUT_DIR || '../wwwroot',
       emptyOutDir: true,
     },
     server: {
