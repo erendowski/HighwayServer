@@ -2,7 +2,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell,
 } from 'recharts';
-import { useActiveTracks } from '../store/selectors';
+import { useEventsStore } from '../store/eventsStore';
 
 interface VehicleTypeChartProps {
   sensorId: string;
@@ -20,9 +20,11 @@ const BAR_COLORS: Record<string, string> = {
 };
 
 export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
-  const tracks = useActiveTracks(sensorId);
+  const events = useEventsStore(s =>
+    s.vehicleEvents.filter(e => e.sensorId === sensorId && e.eventType === 'enter')
+  );
 
-  if (tracks.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center h-60">
         <span className="text-slate-500 text-sm">No data</span>
@@ -32,7 +34,7 @@ export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
 
   const data = VEHICLE_CLASSES.map(cls => ({
     name: cls,
-    count: tracks.filter(t => t.vehicleClass === cls).length,
+    count: events.filter(e => e.vehicleClass === cls).length,
     color: BAR_COLORS[cls] ?? '#94a3b8',
   }));
 

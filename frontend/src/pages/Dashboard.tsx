@@ -2,7 +2,6 @@ import { Activity, Gauge, AlertTriangle, Radio } from 'lucide-react'
 import { useSensorList, useActiveTracks, useIsConnected } from '../store/selectors'
 import { useVehicleStore } from '../store/vehicleStore'
 import { useAnomalyStore } from '../store/anomalyStore'
-import { useStreamStore } from '../store/streamStore'
 import VideoPlayer from '../components/VideoPlayer'
 import FpsChart from '../components/FpsChart'
 import VehicleTypeChart from '../components/VehicleTypeChart'
@@ -30,7 +29,6 @@ function KpiCard({ icon, label, value, sub }: {
 export default function Dashboard() {
   const sensors      = useSensorList()
   const connected    = useIsConnected()
-  const streamReady  = useStreamStore(s => s.ready)
   const activeSensor = sensors.find(s => s.status === 'online') ?? sensors[0]
   const sensorId     = activeSensor?.sensorId ?? ''
 
@@ -67,9 +65,9 @@ export default function Dashboard() {
           sub={connected ? 'SignalR bağlı' : 'bağlantı yok'}
         />
         <KpiCard
-          icon={<Radio size={14} className={streamReady ? 'text-red-400 animate-pulse' : ''} />}
+          icon={<Radio size={14} className={onlineN > 0 ? 'text-red-400 animate-pulse' : ''} />}
           label="Stream Durumu"
-          value={streamReady ? 'LIVE' : 'Offline'}
+          value={onlineN > 0 ? 'LIVE' : 'Offline'}
           sub={`${onlineN}/${sensors.length} sensör`}
         />
       </div>
@@ -79,7 +77,7 @@ export default function Dashboard() {
         <div className="xl:col-span-8">
           <VideoPlayer />
         </div>
-        <div className="xl:col-span-4 h-96">
+        <div className="xl:col-span-4">
           <ActiveTracksPanel sensorId={sensorId} className="h-full" />
         </div>
       </div>
