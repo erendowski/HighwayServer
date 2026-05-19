@@ -1,40 +1,65 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Radio, Video, VideoOff } from 'lucide-react';
 
-const BASE_URL  = import.meta.env.VITE_API_URL ?? '';
-const MJPEG_URL = `${BASE_URL}/mjpeg/highway/mjpeg/`;
+const BASE_URL = import.meta.env.VITE_API_URL ?? '';
+const HLS_URL  = `${BASE_URL}/hls/highway/index.m3u8`;
 
 type ConnState = 'connecting' | 'playing' | 'error';
 
 export default function VideoPlayer() {
+  const videoRef              = useRef<HTMLVideoElement>(null);
+  const hlsRef                = useRef<unknown>(null);
   const [state, setState]     = useState<ConnState>('connecting');
-  const imgRef                = useRef<HTMLImageElement>(null);
-  const retryRef              = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearRetry = () => {
-    if (retryRef.current) { clearTimeout(retryRef.current); retryRef.current = null; }
-  };
-
-  const startStream = useCallback(() => {
-    clearRetry();
-    setState('connecting');
-    if (imgRef.current) {
-      // Cache-bust her yeniden denemede yeni bağlantı açar
-      imgRef.current.src = `${MJPEG_URL}?t=${Date.now()}`;
-    }
-  }, []);
 
   useEffect(() => {
-    startStream();
-    return clearRetry;
-  }, [startStream]);
+    const video = videoRef.current;
+    if (!video) return;
 
-  const handleLoad = () => setState('playing');
+    let destroyed = false;
 
-  const handleError = () => {
-    setState('error');
-    retryRef.current = setTimeout(startStream, 5_000);
-  };
+    const loadHls = async () => {
+      const Hls = (await import('hls.js')).default;
+
+      if (destroyed) return;
+
+      if (Hls.isSupported()) {
+        const hls = new Hls({ liveSyncDurationCount: 1, liveMaxLatencyDurationCount: 3 });
+        hlsRef.current = hls;
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          if (!destroyed) { setState('playing'); video.play().catch(() => {}); }
+        });
+
+        hls.on(Hls.Events.ERROR, (_: unknown, data: { fatal: boolean }) => {
+          if (data.fatal && !destroyed) setState('error');
+        });
+
+        hls.loadSource(HLS_URL);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari native HLS
+        video.src = HLS_URL;
+        video.addEventListener('loadedmetadata', () => {
+          if (!destroyed) { setState('playing'); video.play().catch(() => {}); }
+        });
+        video.addEventListener('error', () => {
+          if (!destroyed) setState('error');
+        });
+      } else {
+        setState('error');
+      }
+    };
+
+    loadHls();
+
+    return () => {
+      destroyed = true;
+      if (hlsRef.current) {
+        (hlsRef.current as { destroy: () => void }).destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
@@ -58,11 +83,11 @@ export default function VideoPlayer() {
 
       {/* Video area */}
       <div className="relative bg-black aspect-video">
-        <img
-          ref={imgRef}
-          onLoad={handleLoad}
-          onError={handleError}
-          alt="MJPEG stream"
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
           className="w-full h-full object-contain"
         />
 
