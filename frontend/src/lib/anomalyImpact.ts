@@ -8,29 +8,29 @@ export interface AnomalyImpactInfo {
 }
 
 export const ANOMALY_IMPACT: Record<AnomalyType, AnomalyImpactInfo> = {
-  STOPPED: {
+  STOPPED_VEHICLE: {
     severity:       'critical',
     title:          'Stopped vehicle on highway',
-    impact:         'High rear-end collision risk. Forces sudden lane changes in following traffic, increases congestion shockwaves.',
+    impact:         'High rear-end collision risk. Forces sudden lane changes in following traffic.',
     recommendation: 'Dispatch highway patrol; warn upstream drivers via VMS.',
   },
-  SLOW: {
-    severity:       'medium',
-    title:          'Slow-moving vehicle',
-    impact:         'Speed differential >40 km/h with mean traffic increases overtaking maneuvers and lane-change collision risk.',
-    recommendation: 'Monitor; advise driver to use right lane if persistent.',
-  },
-  FAST: {
-    severity:       'high',
-    title:          'Speeding',
-    impact:         'Reduced reaction time and longer braking distance; raises severity of any potential collision.',
-    recommendation: 'Log for enforcement; flag plate if ALPR available.',
-  },
-  EXTREME_FAST: {
+  WRONG_WAY: {
     severity:       'critical',
-    title:          'Reckless speeding',
-    impact:         'Loss-of-control risk on curves; multi-vehicle collision potential. Severely endangers other road users.',
-    recommendation: 'Immediate enforcement alert.',
+    title:          'Wrong-way driving',
+    impact:         'Extreme head-on collision risk. One of the highest-fatality highway events.',
+    recommendation: 'Immediate emergency dispatch; close upstream entry if possible.',
+  },
+  LANE_VIOLATION: {
+    severity:       'medium',
+    title:          'Lane violation',
+    impact:         'Vehicle outside designated lane boundaries; risk of sideswipe collisions.',
+    recommendation: 'Monitor; issue warning if persistent.',
+  },
+  POSSIBLE_ACCIDENT: {
+    severity:       'critical',
+    title:          'Possible accident',
+    impact:         'Multiple stopped vehicles in close proximity — collision or breakdown cluster.',
+    recommendation: 'Immediate emergency dispatch; review camera footage.',
   },
   SUDDEN_BRAKE: {
     severity:       'high',
@@ -38,23 +38,17 @@ export const ANOMALY_IMPACT: Record<AnomalyType, AnomalyImpactInfo> = {
     impact:         'Indicates possible obstacle or near-miss. Following vehicles may not have safe stopping distance.',
     recommendation: 'Check for upstream incident; review camera footage.',
   },
-  SUDDEN_ACCEL: {
+  OVERSPEED: {
+    severity:       'high',
+    title:          'Speed limit exceeded',
+    impact:         'Reduced reaction time and longer braking distance; raises collision severity.',
+    recommendation: 'Log for enforcement; flag plate if ALPR available.',
+  },
+  UNDERSPEED: {
     severity:       'medium',
-    title:          'Aggressive acceleration',
-    impact:         'Associated with aggressive driving patterns; predictive indicator for further violations.',
-    recommendation: 'Flag track for sustained monitoring.',
-  },
-  WRONG_DIRECTION: {
-    severity:       'critical',
-    title:          'Wrong-way driving',
-    impact:         'Extreme head-on collision risk. One of the highest-fatality highway events.',
-    recommendation: 'Immediate emergency dispatch; close upstream entry if possible.',
-  },
-  GHOST: {
-    severity:       'low',
-    title:          'Possible tracking artifact',
-    impact:         'Telemetry inconsistency; not a real driving event. May indicate occlusion or ID switch.',
-    recommendation: 'No action; review tracker logs if frequent.',
+    title:          'Minimum speed violation',
+    impact:         'Speed differential with mean traffic increases overtaking maneuvers and lane-change risk.',
+    recommendation: 'Monitor; advise driver to use right lane if persistent.',
   },
 };
 

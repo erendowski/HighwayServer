@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   AlertTriangle, OctagonAlert, Snail, Zap, ParkingCircle,
-  Car, Truck, Bus, Bike, Plane, Send,
+  Car, Truck, Bus, Bike,
   ChevronDown, ChevronRight,
 } from 'lucide-react';
 import { useAnomalyStore, type AnomalyFeedItem } from '../store/anomalyStore';
@@ -20,14 +20,13 @@ const CLASS_ICONS: Record<string, React.ReactNode> = {
 };
 
 const ANOMALY_ICONS: Record<AnomalyType, React.ReactNode> = {
-  STOPPED:         <ParkingCircle size={14} className="text-purple-400" />,
-  SLOW:            <Snail         size={14} className="text-amber-400"  />,
-  FAST:            <Zap           size={14} className="text-red-400"    />,
-  EXTREME_FAST:    <OctagonAlert  size={14} className="text-red-500"    />,
-  SUDDEN_BRAKE:    <AlertTriangle size={14} className="text-orange-400" />,
-  SUDDEN_ACCEL:    <Zap           size={14} className="text-yellow-400" />,
-  WRONG_DIRECTION: <OctagonAlert  size={14} className="text-red-600"    />,
-  GHOST:           <AlertTriangle size={14} className="text-slate-400"  />,
+  STOPPED_VEHICLE:   <ParkingCircle size={14} className="text-purple-400" />,
+  WRONG_WAY:         <OctagonAlert  size={14} className="text-red-600"    />,
+  LANE_VIOLATION:    <AlertTriangle size={14} className="text-amber-400"  />,
+  POSSIBLE_ACCIDENT: <OctagonAlert  size={14} className="text-red-500"    />,
+  SUDDEN_BRAKE:      <AlertTriangle size={14} className="text-orange-400" />,
+  OVERSPEED:         <Zap           size={14} className="text-red-400"    />,
+  UNDERSPEED:        <Snail         size={14} className="text-amber-400"  />,
 };
 
 function relativeTime(epochMs: number) {

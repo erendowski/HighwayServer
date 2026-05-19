@@ -117,8 +117,8 @@ export interface SensorState {
 // ─── Anomaly types ────────────────────────────────────────────────────────────
 
 export type AnomalyType =
-  | 'STOPPED' | 'SLOW' | 'FAST' | 'EXTREME_FAST'
-  | 'SUDDEN_BRAKE' | 'SUDDEN_ACCEL' | 'WRONG_DIRECTION' | 'GHOST';
+  | 'STOPPED_VEHICLE' | 'WRONG_WAY' | 'LANE_VIOLATION' | 'POSSIBLE_ACCIDENT'
+  | 'SUDDEN_BRAKE' | 'OVERSPEED' | 'UNDERSPEED';
 
 export type AnomalySeverity = 'low' | 'medium' | 'high' | 'critical';
 
