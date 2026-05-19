@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Radio, Video, VideoOff } from 'lucide-react';
 
 const BASE_URL  = import.meta.env.VITE_API_URL ?? '';
@@ -8,33 +8,102 @@ const RETRY_MS  = 4_000;
 type ConnState = 'connecting' | 'playing' | 'error';
 
 export default function VideoPlayer() {
+  const canvasRef         = useRef<HTMLCanvasElement>(null);
   const [state, setState] = useState<ConnState>('connecting');
-  const imgRef            = useRef<HTMLImageElement>(null);
+  const abortRef          = useRef<AbortController | null>(null);
   const retryRef          = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearRetry = () => {
     if (retryRef.current) { clearTimeout(retryRef.current); retryRef.current = null; }
   };
 
-  const startStream = useCallback(() => {
+  const connect = useCallback(async () => {
     clearRetry();
+    if (abortRef.current) abortRef.current.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setState('connecting');
-    if (imgRef.current) {
-      // cache-bust → yeni multipart bağlantısı aç
-      imgRef.current.src = `${MJPEG_URL}?t=${Date.now()}`;
+
+    try {
+      const res = await fetch(MJPEG_URL, { signal: ctrl.signal });
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body.getReader();
+      let buf = new Uint8Array(0);
+      let firstFrame = true;
+
+      const indexOf = (haystack: Uint8Array, needle: Uint8Array, from = 0): number => {
+        outer: for (let i = from; i <= haystack.length - needle.length; i++) {
+          for (let j = 0; j < needle.length; j++) {
+            if (haystack[i + j] !== needle[j]) continue outer;
+          }
+          return i;
+        }
+        return -1;
+      };
+
+      const SOI = new Uint8Array([0xff, 0xd8]);
+      const EOI = new Uint8Array([0xff, 0xd9]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const merged = new Uint8Array(buf.length + value.length);
+        merged.set(buf);
+        merged.set(value, buf.length);
+        buf = merged;
+
+        // extract all complete JPEG frames from buffer
+        let soiIdx: number;
+        while ((soiIdx = indexOf(buf, SOI)) !== -1) {
+          const eoiIdx = indexOf(buf, EOI, soiIdx + 2);
+          if (eoiIdx === -1) break;
+
+          const jpeg = buf.slice(soiIdx, eoiIdx + 2);
+          buf = buf.slice(eoiIdx + 2);
+
+          const blob = new Blob([jpeg], { type: 'image/jpeg' });
+          const url  = URL.createObjectURL(blob);
+          const img  = new Image();
+
+          await new Promise<void>((resolve) => {
+            img.onload = () => {
+              const canvas = canvasRef.current;
+              if (canvas) {
+                canvas.width  = img.width;
+                canvas.height = img.height;
+                canvas.getContext('2d')?.drawImage(img, 0, 0);
+              }
+              URL.revokeObjectURL(url);
+              if (firstFrame) { setState('playing'); firstFrame = false; }
+              resolve();
+            };
+            img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+            img.src = url;
+          });
+        }
+
+        // prevent unbounded buffer growth (keep last 512KB)
+        if (buf.length > 512 * 1024) {
+          const soiLast = indexOf(buf, SOI, buf.length - 256 * 1024);
+          if (soiLast > 0) buf = buf.slice(soiLast);
+        }
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      setState('error');
+      retryRef.current = setTimeout(connect, RETRY_MS);
     }
   }, []);
 
   useEffect(() => {
-    startStream();
-    return clearRetry;
-  }, [startStream]);
-
-  const handleLoad  = () => setState('playing');
-  const handleError = () => {
-    setState('error');
-    retryRef.current = setTimeout(startStream, RETRY_MS);
-  };
+    connect();
+    return () => {
+      clearRetry();
+      abortRef.current?.abort();
+    };
+  }, [connect]);
 
   return (
     <div className="flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
@@ -58,11 +127,8 @@ export default function VideoPlayer() {
 
       {/* Video area */}
       <div className="relative bg-black aspect-video">
-        <img
-          ref={imgRef}
-          onLoad={handleLoad}
-          onError={handleError}
-          alt="MJPEG stream"
+        <canvas
+          ref={canvasRef}
           className="w-full h-full object-contain"
         />
 
