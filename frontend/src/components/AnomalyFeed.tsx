@@ -15,8 +15,7 @@ const CLASS_ICONS: Record<string, React.ReactNode> = {
   van:        <Truck size={14} />,
   bus:        <Bus   size={14} />,
   motorcycle: <Bike  size={14} />,
-  plane:      <Plane size={14} />,
-  drone:      <Send  size={14} />,
+  truck:      <Truck size={14} />,
 };
 
 const ANOMALY_ICONS: Record<AnomalyType, React.ReactNode> = {
