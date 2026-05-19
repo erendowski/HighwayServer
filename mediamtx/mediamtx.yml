@@ -19,6 +19,10 @@ webrtcAdditionalHosts:
   - 100.84.29.29   # RPi5 Tailscale IP
   - 192.168.0.17   # RPi5 LAN IP
 
+# ── MJPEG — MediaMTX her path için otomatik sunar ────────────────────────────
+# Endpoint: http://<host>:8889/<path>/mjpeg
+# nginx /mjpeg/ → mediamtx:8889/ olarak proxy'leniyor
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
   cam1:
