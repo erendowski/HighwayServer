@@ -25,5 +25,6 @@ paths:
     source: publisher
 
   highway:
-    # Jetson rtspclientsink ile TCP üzerinden push eder
-    source: publisher
+    # MediaMTX Jetson'ın kendi GstRtspServer'ından TCP ile çeker
+    source: rtsp://100.74.245.10:8554/stream
+    sourceProtocol: tcp
