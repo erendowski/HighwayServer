@@ -73,19 +73,17 @@ export default function Dashboard() {
       </div>
 
       {/* Video + Active Tracks — eşit yükseklikte yan yana */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 h-130">
-        <div className="xl:col-span-8 h-full">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4" style={{ gridAutoRows: '520px' }}>
+        <div className="xl:col-span-8 h-full min-h-0">
           <VideoPlayer />
         </div>
-        <div className="xl:col-span-4 h-full">
+        <div className="xl:col-span-4 h-full min-h-0 overflow-hidden">
           <ActiveTracksPanel sensorId={sensorId} className="h-full" />
         </div>
       </div>
 
       {/* Anomaly Feed */}
-      <div className="h-96">
-        <AnomalyFeed className="h-full" />
-      </div>
+      <AnomalyFeed className="max-h-96" />
 
       {/* Charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
