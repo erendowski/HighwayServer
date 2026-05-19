@@ -20,9 +20,8 @@ const BAR_COLORS: Record<string, string> = {
 };
 
 export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
-  const events = useEventsStore(s =>
-    s.vehicleEvents.filter(e => e.sensorId === sensorId && e.eventType === 'enter')
-  );
+  const vehicleEvents = useEventsStore(s => s.vehicleEvents);
+  const events = vehicleEvents.filter(e => e.sensorId === sensorId && e.eventType === 'enter');
 
   if (events.length === 0) {
     return (
