@@ -37,12 +37,19 @@ function relativeTime(epochMs: number) {
 
 // ── Single feed entry ─────────────────────────────────────────────────────────
 
+const FALLBACK_IMPACT = {
+  title: 'Anomaly detected',
+  impact: '',
+  recommendation: '',
+};
+
 function AnomalyEntry({ item, onLocate }: { item: AnomalyFeedItem; onLocate?: (trackId: number) => void }) {
   const [expanded, setExpanded] = useState(true);
-  const info = ANOMALY_IMPACT[item.anomalyType];
+  const info = ANOMALY_IMPACT[item.anomalyType] ?? FALLBACK_IMPACT;
+  const severityKey = (item.severity in SEVERITY_COLORS ? item.severity : 'medium') as keyof typeof SEVERITY_COLORS;
 
   return (
-    <div className={`rounded-xl border p-3 space-y-2 transition-colors ${SEVERITY_COLORS[item.severity]}`}>
+    <div className={`rounded-xl border p-3 space-y-2 transition-colors ${SEVERITY_COLORS[severityKey]}`}>
       {/* Header row */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-slate-300 shrink-0">
@@ -52,11 +59,11 @@ function AnomalyEntry({ item, onLocate }: { item: AnomalyFeedItem; onLocate?: (t
         <span className="text-xs text-slate-400 capitalize">{item.vehicleClass}</span>
 
         <span className="flex items-center gap-1 ml-1">
-          {ANOMALY_ICONS[item.anomalyType]}
+          {ANOMALY_ICONS[item.anomalyType as keyof typeof ANOMALY_ICONS] ?? <AlertTriangle size={14} className="text-slate-400" />}
           <span className="text-xs font-semibold text-white">{info.title}</span>
         </span>
 
-        <span className={`ml-auto text-xs px-1.5 py-0.5 rounded font-semibold ${SEVERITY_BADGE[item.severity]}`}>
+        <span className={`ml-auto text-xs px-1.5 py-0.5 rounded font-semibold ${SEVERITY_BADGE[severityKey]}`}>
           {item.severity}
         </span>
 

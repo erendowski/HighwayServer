@@ -118,7 +118,8 @@ export interface SensorState {
 
 export type AnomalyType =
   | 'STOPPED_VEHICLE' | 'WRONG_WAY' | 'LANE_VIOLATION' | 'POSSIBLE_ACCIDENT'
-  | 'SUDDEN_BRAKE' | 'OVERSPEED' | 'UNDERSPEED';
+  | 'SUDDEN_BRAKE' | 'OVERSPEED' | 'UNDERSPEED'
+  | (string & {}); // allow unknown types from Jetson without crashing
 
 export type AnomalySeverity = 'low' | 'medium' | 'high' | 'critical';
 
