@@ -52,6 +52,51 @@ export const ANOMALY_IMPACT: Record<AnomalyType, AnomalyImpactInfo> = {
   },
 };
 
+export interface AnomalyImpactTr {
+  title:          string;
+  impact:         string;
+  recommendation: string;
+}
+
+/** Turkish copy for the live-view adverse-conditions panel. */
+export const ANOMALY_TR: Record<string, AnomalyImpactTr> = {
+  STOPPED_VEHICLE: {
+    title:          'Duran araç',
+    impact:         'Yüksek arkadan çarpma riski; takip eden trafikte ani şerit değişikliklerine yol açar.',
+    recommendation: 'Yol devriyesi yönlendirin; üst akıştaki sürücüleri uyarın.',
+  },
+  WRONG_WAY: {
+    title:          'Ters yön sürüş',
+    impact:         'Aşırı kafa kafaya çarpışma riski; en ölümcül olaylardan biri.',
+    recommendation: 'Acil müdahale ekibi yönlendirin; girişi kapatın.',
+  },
+  LANE_VIOLATION: {
+    title:          'Şerit ihlali',
+    impact:         'Araç şerit dışında; yandan çarpışma riski.',
+    recommendation: 'İzleyin; ısrarcıysa uyarı verin.',
+  },
+  POSSIBLE_ACCIDENT: {
+    title:          'Olası kaza',
+    impact:         'Yakın mesafede birden fazla duran araç — çarpışma/arıza kümesi.',
+    recommendation: 'Acil müdahale ekibi yönlendirin.',
+  },
+  SUDDEN_BRAKE: {
+    title:          'Ani fren',
+    impact:         'Olası engel veya kıl payı kaza işareti.',
+    recommendation: 'Üst akışta olay olup olmadığını kontrol edin.',
+  },
+  OVERSPEED: {
+    title:          'Hız aşımı',
+    impact:         'Tepki süresini kısaltır, fren mesafesini uzatır.',
+    recommendation: 'Denetim için kaydedin.',
+  },
+  UNDERSPEED: {
+    title:          'Düşük hız',
+    impact:         'Hız farkı sollama ve şerit değişikliği riskini artırır.',
+    recommendation: 'İzleyin; sağ şeridi önerin.',
+  },
+};
+
 export const SEVERITY_COLORS: Record<AnomalySeverity, string> = {
   low:      'bg-slate-700/60 text-slate-300 border-slate-600',
   medium:   'bg-amber-900/60 text-amber-300 border-amber-700',

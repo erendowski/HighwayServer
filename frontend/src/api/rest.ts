@@ -48,6 +48,25 @@ export const api = {
       .then(r => r.data);
   },
 
+  // Anomaly export — downloads a CSV (Excel) report for the last 24h.
+  exportAnomalies: async (id: string) => {
+    const res = await http.get(`/api/sensors/${id}/history/anomalies/export`, {
+      responseType: 'blob',
+    });
+    const disposition = res.headers['content-disposition'] as string | undefined;
+    const match = disposition?.match(/filename="?([^"]+)"?/);
+    const fileName = match?.[1] ?? `anomali-raporu_${id}.csv`;
+
+    const url = URL.createObjectURL(res.data as Blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   // Commands
   sendCommand: (sensorId: string, body: CommandRequest) =>
     http.post<CommandAck>(`/api/sensors/${sensorId}/commands`, body).then(r => r.data),

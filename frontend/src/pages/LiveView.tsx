@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Car, Truck, Bus, Bike, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { Car, Truck, Bus, Bike, ArrowLeft, AlertTriangle, FileDown, ShieldAlert } from 'lucide-react';
 import { useSensor } from '../store/selectors';
 import { useVehicleStore } from '../store/vehicleStore';
-import type { AnomalySeverity } from '../types/contracts';
+import { api } from '../api/rest';
+import { ANOMALY_TR } from '../lib/anomalyImpact';
+import type { AnomalySeverity, AnomalyType } from '../types/contracts';
 import VideoPlayer from '../components/VideoPlayer';
 import MapView from '../components/MapView';
 import VehicleDetailModal from '../components/VehicleDetailModal';
@@ -50,6 +52,42 @@ export default function LiveView() {
     [vehicleMap]
   );
   const [modalOpen, setModalOpen]             = useState(false);
+  const [exporting, setExporting]             = useState(false);
+  const [exportError, setExportError]         = useState<string | null>(null);
+
+  // Distinct adverse conditions currently active (one row per anomaly type, worst severity).
+  const adverseConditions = useMemo(() => {
+    const byType = new Map<AnomalyType, { severity: AnomalySeverity; count: number }>();
+    for (const v of anomalyVehicles) {
+      for (const a of v.anomalies) {
+        const existing = byType.get(a.type);
+        if (!existing) {
+          byType.set(a.type, { severity: a.severity, count: 1 });
+        } else {
+          existing.count += 1;
+          if (SEV_ORDER.indexOf(a.severity) < SEV_ORDER.indexOf(existing.severity)) {
+            existing.severity = a.severity;
+          }
+        }
+      }
+    }
+    return Array.from(byType.entries())
+      .map(([type, info]) => ({ type, ...info }))
+      .sort((a, b) => SEV_ORDER.indexOf(a.severity) - SEV_ORDER.indexOf(b.severity));
+  }, [anomalyVehicles]);
+
+  async function handleExport() {
+    if (!sensorId) return;
+    setExporting(true);
+    setExportError(null);
+    try {
+      await api.exportAnomalies(sensorId);
+    } catch {
+      setExportError('Dışa aktarma başarısız oldu');
+    } finally {
+      setExporting(false);
+    }
+  }
 
   if (!sensorId) return <div className="p-8 text-slate-400">Sensör bulunamadı</div>;
 
@@ -81,6 +119,21 @@ export default function LiveView() {
             ● {sensor.status}
           </span>
         )}
+
+        <div className="ml-auto flex items-center gap-2">
+          {exportError && (
+            <span className="text-xs text-red-400">{exportError}</span>
+          )}
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 text-sm text-white px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Son 24 saatin anomali kayıtlarını Excel (CSV) olarak indir"
+          >
+            <FileDown size={14} />
+            {exporting ? 'Hazırlanıyor…' : "Excel'e Aktar"}
+          </button>
+        </div>
       </div>
 
       {/* Kamera + Harita */}
@@ -91,6 +144,56 @@ export default function LiveView() {
           selectedTrackId={selectedTrackId}
           onTrackSelect={selectTrack}
         />
+      </div>
+
+      {/* Olumsuz koşullar özeti */}
+      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/60">
+          <div className="flex items-center gap-2">
+            <ShieldAlert size={16} className="text-amber-400" />
+            <h2 className="text-sm font-semibold text-white">Olumsuz Koşullar</h2>
+          </div>
+          <span className="text-xs text-slate-400">{adverseConditions.length} aktif tür</span>
+        </div>
+
+        {adverseConditions.length === 0 ? (
+          <p className="px-4 py-6 text-center text-slate-500 text-sm">
+            Şu anda olumsuz bir koşul tespit edilmedi
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3">
+            {adverseConditions.map(c => {
+              const tr = ANOMALY_TR[c.type] ?? {
+                title: c.type, impact: '', recommendation: '',
+              };
+              return (
+                <div
+                  key={c.type}
+                  className={`rounded-xl border p-3 space-y-1.5 ${SEV_COLORS[c.severity]}`}
+                >
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <AlertTriangle size={14} className="text-amber-300 shrink-0" />
+                    <span className="text-sm font-semibold text-white">{tr.title}</span>
+                    <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${SEV_BADGE[c.severity]}`}>
+                      {c.severity}
+                    </span>
+                    <span className="ml-auto text-xs text-slate-400">{c.count} araç</span>
+                  </div>
+                  {tr.impact && (
+                    <p className="text-xs text-slate-300">
+                      <span className="font-semibold text-slate-200">Etki: </span>{tr.impact}
+                    </p>
+                  )}
+                  {tr.recommendation && (
+                    <p className="text-xs text-slate-300">
+                      <span className="font-semibold text-amber-400">Aksiyon: </span>{tr.recommendation}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Anomali araçlar */}

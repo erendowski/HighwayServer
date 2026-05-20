@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useActiveTracks } from '../store/selectors';
+import { useVehicleStore } from '../store/vehicleStore';
+import { computeDensity } from '../lib/trafficDensity';
 import type { TrackState } from '../types/contracts';
 
 interface MapViewProps {
@@ -65,6 +67,12 @@ export default function MapView({
   const center: [number, number] = [lat, lng];
   const fallbacks = useRef(new Map<number, [number, number]>());
 
+  const vehicleMap = useVehicleStore(s => s.vehicles[sensorId]);
+  const density = useMemo(
+    () => computeDensity(Object.values(vehicleMap ?? {})),
+    [vehicleMap],
+  );
+
   const selectedTrack = selectedTrackId != null
     ? tracks.find(t => t.trackId === selectedTrackId) ?? null
     : null;
@@ -74,9 +82,17 @@ export default function MapView({
 
   return (
     <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700 gap-2 flex-wrap">
         <h2 className="text-sm font-semibold text-slate-300">Araç Haritası — {sensorId}</h2>
-        <span className="text-xs text-slate-400">{tracks.length} aktif</span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${density.badgeClass}`}
+            title={`${density.vehicleCount} araç • ort. ${density.avgSpeedKmh.toFixed(0)} km/h`}
+          >
+            Trafik: {density.label}
+          </span>
+          <span className="text-xs text-slate-400">{tracks.length} aktif</span>
+        </div>
       </div>
       <div className="relative aspect-video w-full">
         <MapContainer

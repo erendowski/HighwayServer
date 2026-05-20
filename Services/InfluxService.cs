@@ -241,6 +241,46 @@ public sealed class InfluxService
         }
     }
 
+    public async Task<List<AnomalyRecord>> QueryAnomaliesAsync(
+        string sensorId, DateTimeOffset from, DateTimeOffset to)
+    {
+        var flux = $"""
+            from(bucket: "{_opts.Bucket}")
+              |> range(start: {from.UtcDateTime:yyyy-MM-ddTHH:mm:ssZ}, stop: {to.UtcDateTime:yyyy-MM-ddTHH:mm:ssZ})
+              |> filter(fn: (r) => r["_measurement"] == "anomalies")
+              |> filter(fn: (r) => r["sensor_id"] == "{sensorId}")
+              |> pivot(rowKey: ["_time", "sensor_id", "track_id", "type", "severity", "class"], columnKey: ["_field"], valueColumn: "_value")
+              |> sort(columns: ["_time"], desc: true)
+            """;
+
+        try
+        {
+            var tables  = await _client.GetQueryApi().QueryAsync(flux, _opts.Org);
+            var results = new List<AnomalyRecord>();
+            foreach (var table in tables)
+            foreach (var record in table.Records)
+            {
+                var rawTime = record.GetTime()?.ToDateTimeUtc() ?? DateTime.UtcNow;
+                var deltaRaw = record.GetValueByKey("delta");
+                results.Add(new AnomalyRecord(
+                    Ts:           new DateTimeOffset(rawTime, TimeSpan.Zero),
+                    SensorId:     record.GetValueByKey("sensor_id")?.ToString()  ?? string.Empty,
+                    TrackId:      Convert.ToInt32(record.GetValueByKey("track_id") ?? 0),
+                    VehicleClass: record.GetValueByKey("class")?.ToString()      ?? string.Empty,
+                    AnomalyType:  record.GetValueByKey("type")?.ToString()       ?? string.Empty,
+                    Severity:     record.GetValueByKey("severity")?.ToString()   ?? string.Empty,
+                    SpeedKmh:     Convert.ToSingle(record.GetValueByKey("speed_kmh") ?? 0f),
+                    Delta:        deltaRaw is null ? null : Convert.ToSingle(deltaRaw)));
+            }
+            return results;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "InfluxDB anomaly query failed for sensor={SensorId}", sensorId);
+            return [];
+        }
+    }
+
     public async Task<List<VehicleEventRecord>> QueryVehicleEventsAsync(
         string sensorId, DateTimeOffset from, DateTimeOffset to)
     {
