@@ -107,7 +107,7 @@ public sealed class HistoryController : ControllerBase
         var sb = new StringBuilder();
         // sep hint makes Excel use ';' as the delimiter regardless of locale.
         sb.Append("sep=;\r\n");
-        sb.Append("Zaman (UTC);Zaman (Yerel);Sensör;Track ID;Araç Sınıfı;Anomali Tipi;Önem;Hız (km/h);Değişim (km/h/s);Etki;Önerilen Aksiyon\r\n");
+        sb.Append("Time (UTC);Time (Local);Sensor;Track ID;Vehicle Class;Anomaly Type;Severity;Speed (km/h);Delta (km/h/s);Impact;Recommended Action\r\n");
 
         foreach (var a in data)
         {
@@ -126,14 +126,14 @@ public sealed class HistoryController : ControllerBase
             sb.Append(Csv(impact.Recommendation));                                                 sb.Append("\r\n");
         }
 
-        // UTF-8 BOM so Excel renders Turkish characters correctly.
+        // UTF-8 BOM keeps Excel happy across locales (content is ASCII-only).
         var bom   = new byte[] { 0xEF, 0xBB, 0xBF };
         var body  = Encoding.UTF8.GetBytes(sb.ToString());
         var bytes = new byte[bom.Length + body.Length];
         Buffer.BlockCopy(bom, 0, bytes, 0, bom.Length);
         Buffer.BlockCopy(body, 0, bytes, bom.Length, body.Length);
 
-        var fileName = $"anomali-raporu_{sensorId}_{DateTimeOffset.Now:yyyyMMdd-HHmm}.csv";
+        var fileName = $"anomaly-report_{sensorId}_{DateTimeOffset.Now:yyyyMMdd-HHmm}.csv";
         return File(bytes, "text/csv; charset=utf-8", fileName);
     }
 

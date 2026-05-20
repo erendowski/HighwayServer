@@ -7,6 +7,8 @@ import { useConnectionStore } from '../store/connectionStore';
 import { useVehicleStore } from '../store/vehicleStore';
 import { useAnomalyStore } from '../store/anomalyStore';
 import { useStreamStore } from '../store/streamStore';
+import { useToastStore } from '../store/toastStore';
+import { ANOMALY_TR } from '../lib/anomalyImpact';
 import type {
   SensorState,
   SensorStatusPayload,
@@ -116,6 +118,17 @@ export function getConnection(): signalR.HubConnection {
       delta:       p.delta,
       detectedAt:  Date.now(),
     });
+
+    // Hafif ekran içi bildirim — sadece yüksek/kritik önemde (gürültüyü azalt).
+    if (p.severity === 'critical' || p.severity === 'high') {
+      const tr = ANOMALY_TR[p.anomalyType];
+      const title = tr?.title ?? p.anomalyType;
+      useToastStore.getState().pushToast({
+        title: `${title} — #${p.trackId}`,
+        message: `${p.sensorId} • ${p.vehicleClass} • ${p.speedKmh.toFixed(0)} km/h`,
+        severity: p.severity,
+      });
+    }
   });
 
   _connection.on('streamstatuschanged', (p: StreamStatusPayload) => {

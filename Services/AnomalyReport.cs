@@ -1,6 +1,6 @@
 namespace HighwayServer.Services;
 
-/// <summary>Turkish labels + impact text for anomaly reporting (CSV export).</summary>
+/// <summary>English labels + impact text for anomaly reporting (CSV export).</summary>
 public static class AnomalyReport
 {
     public readonly record struct ImpactInfo(string Impact, string Recommendation);
@@ -8,51 +8,51 @@ public static class AnomalyReport
     private static readonly Dictionary<string, ImpactInfo> Impacts = new()
     {
         ["STOPPED_VEHICLE"] = new(
-            "Yüksek arkadan çarpma riski. Takip eden trafikte ani şerit değişikliklerine yol açar.",
-            "Yol devriyesi yönlendirin; üst akıştaki sürücüleri VMS ile uyarın."),
+            "High rear-end collision risk. Forces sudden lane changes in following traffic.",
+            "Dispatch highway patrol; warn upstream drivers via VMS."),
         ["WRONG_WAY"] = new(
-            "Aşırı kafa kafaya çarpışma riski. En ölümcül otoyol olaylarından biri.",
-            "Acil müdahale ekibi yönlendirin; mümkünse üst akış girişini kapatın."),
+            "Extreme head-on collision risk. One of the highest-fatality highway events.",
+            "Immediate emergency dispatch; close upstream entry if possible."),
         ["LANE_VIOLATION"] = new(
-            "Araç şerit sınırları dışında; yandan çarpışma riski.",
-            "İzleyin; ısrarcıysa uyarı verin."),
+            "Vehicle outside designated lane boundaries; risk of sideswipe collisions.",
+            "Monitor; issue warning if persistent."),
         ["POSSIBLE_ACCIDENT"] = new(
-            "Yakın mesafede birden fazla duran araç — çarpışma veya arıza kümesi.",
-            "Acil müdahale ekibi yönlendirin; kamera kaydını inceleyin."),
+            "Multiple stopped vehicles in close proximity - collision or breakdown cluster.",
+            "Immediate emergency dispatch; review camera footage."),
         ["SUDDEN_BRAKE"] = new(
-            "Olası engel veya kıl payı kaza işareti. Takip eden araçlar güvenli durma mesafesine sahip olmayabilir.",
-            "Üst akışta olay olup olmadığını kontrol edin; kamera kaydını inceleyin."),
+            "Possible obstacle or near-miss. Following vehicles may not have safe stopping distance.",
+            "Check for upstream incident; review camera footage."),
         ["OVERSPEED"] = new(
-            "Tepki süresini kısaltır, fren mesafesini uzatır; çarpışma şiddetini artırır.",
-            "Denetim için kaydedin; ALPR varsa plakayı işaretleyin."),
+            "Reduced reaction time and longer braking distance; raises collision severity.",
+            "Log for enforcement; flag plate if ALPR available."),
         ["UNDERSPEED"] = new(
-            "Ortalama trafikle hız farkı sollama manevralarını ve şerit değişikliği riskini artırır.",
-            "İzleyin; ısrarcıysa sürücüye sağ şeridi kullanmasını önerin."),
+            "Speed differential with mean traffic increases overtaking and lane-change risk.",
+            "Monitor; advise driver to use right lane if persistent."),
     };
 
     private static readonly Dictionary<string, string> TypeLabels = new()
     {
-        ["STOPPED_VEHICLE"]   = "Duran Araç",
-        ["WRONG_WAY"]         = "Ters Yön",
-        ["LANE_VIOLATION"]    = "Şerit İhlali",
-        ["POSSIBLE_ACCIDENT"] = "Olası Kaza",
-        ["SUDDEN_BRAKE"]      = "Ani Fren",
-        ["OVERSPEED"]         = "Hız Aşımı",
-        ["UNDERSPEED"]        = "Düşük Hız",
+        ["STOPPED_VEHICLE"]   = "Stopped Vehicle",
+        ["WRONG_WAY"]         = "Wrong Way",
+        ["LANE_VIOLATION"]    = "Lane Violation",
+        ["POSSIBLE_ACCIDENT"] = "Possible Accident",
+        ["SUDDEN_BRAKE"]      = "Sudden Brake",
+        ["OVERSPEED"]         = "Overspeed",
+        ["UNDERSPEED"]        = "Underspeed",
     };
 
     private static readonly Dictionary<string, string> SeverityLabels = new()
     {
-        ["critical"] = "Kritik",
-        ["high"]     = "Yüksek",
-        ["medium"]   = "Orta",
-        ["low"]      = "Düşük",
+        ["critical"] = "Critical",
+        ["high"]     = "High",
+        ["medium"]   = "Medium",
+        ["low"]      = "Low",
     };
 
     public static ImpactInfo Impact(string anomalyType) =>
         Impacts.TryGetValue(anomalyType, out var info)
             ? info
-            : new ImpactInfo("Anomali tespit edildi.", "İzleyin.");
+            : new ImpactInfo("Anomaly detected.", "Monitor.");
 
     public static string TypeLabel(string anomalyType) =>
         TypeLabels.TryGetValue(anomalyType, out var label) ? label : anomalyType;

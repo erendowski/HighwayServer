@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import LiveView from './pages/LiveView'
 import { useSignalRConnection } from './hooks/useSignalRConnection'
 import { useSensorsStore } from './store/sensorsStore'
+import ToastContainer from './components/ToastContainer'
 
 function useDarkMode() {
   const [dark, setDark] = useState(() => {
@@ -32,6 +33,7 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-950 text-white">
+      <ToastContainer />
       <div style={{ position: 'fixed', top: 8, right: 48, fontSize: 11, color: connected ? 'lime' : 'red', zIndex: 9999 }}>
         {connected ? '● Live' : error ? '✕ Error' : '○ Connecting...'}
       </div>

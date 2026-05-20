@@ -217,3 +217,14 @@ export interface VehicleEventRecord {
   vehicleClass: string;
   eventType: string;
 }
+
+export interface AnomalyRecord {
+  ts: string;
+  sensorId: string;
+  trackId: number;
+  vehicleClass: string;
+  anomalyType: AnomalyType;
+  severity: AnomalySeverity;
+  speedKmh: number;
+  delta?: number;
+}

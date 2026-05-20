@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Car, Truck, Bus, Bike, ArrowLeft, AlertTriangle, FileDown, ShieldAlert } from 'lucide-react';
 import { useSensor } from '../store/selectors';
 import { useVehicleStore } from '../store/vehicleStore';
+import { useAnomalyStore } from '../store/anomalyStore';
 import { api } from '../api/rest';
 import { ANOMALY_TR } from '../lib/anomalyImpact';
 import type { AnomalySeverity, AnomalyType } from '../types/contracts';
@@ -34,6 +35,13 @@ const SEV_BADGE: Record<AnomalySeverity, string> = {
 
 const SEV_ORDER: AnomalySeverity[] = ['critical', 'high', 'medium', 'low'];
 
+function relativeTime(epochMs: number) {
+  const s = Math.floor((Date.now() - epochMs) / 1000);
+  if (s < 60)   return `${s} sn önce`;
+  if (s < 3600) return `${Math.floor(s / 60)} dk önce`;
+  return `${Math.floor(s / 3600)} sa önce`;
+}
+
 export default function LiveView() {
   const { sensorId }   = useParams<{ sensorId: string }>();
   const navigate       = useNavigate();
@@ -55,26 +63,34 @@ export default function LiveView() {
   const [exporting, setExporting]             = useState(false);
   const [exportError, setExportError]         = useState<string | null>(null);
 
-  // Distinct adverse conditions currently active (one row per anomaly type, worst severity).
+  // Kalıcı anomali geçmişi (global store) — araç "lost" olsa da kayıt kaybolmaz.
+  const anomalyFeed = useAnomalyStore(s => s.feed);
+
+  // Distinct adverse conditions (one row per anomaly type, worst severity, latest time).
+  // Bu sensöre ait tüm anomali geçmişinden türetilir; ortadan kaybolmaz.
   const adverseConditions = useMemo(() => {
-    const byType = new Map<AnomalyType, { severity: AnomalySeverity; count: number }>();
-    for (const v of anomalyVehicles) {
-      for (const a of v.anomalies) {
-        const existing = byType.get(a.type);
-        if (!existing) {
-          byType.set(a.type, { severity: a.severity, count: 1 });
-        } else {
-          existing.count += 1;
-          if (SEV_ORDER.indexOf(a.severity) < SEV_ORDER.indexOf(existing.severity)) {
-            existing.severity = a.severity;
-          }
+    const byType = new Map<AnomalyType, {
+      severity: AnomalySeverity; count: number; lastAt: number;
+    }>();
+    for (const item of anomalyFeed) {
+      if (item.sensorId !== sensorId) continue;
+      const existing = byType.get(item.anomalyType);
+      if (!existing) {
+        byType.set(item.anomalyType, {
+          severity: item.severity, count: 1, lastAt: item.receivedAt,
+        });
+      } else {
+        existing.count += 1;
+        existing.lastAt = Math.max(existing.lastAt, item.receivedAt);
+        if (SEV_ORDER.indexOf(item.severity) < SEV_ORDER.indexOf(existing.severity)) {
+          existing.severity = item.severity;
         }
       }
     }
     return Array.from(byType.entries())
       .map(([type, info]) => ({ type, ...info }))
       .sort((a, b) => SEV_ORDER.indexOf(a.severity) - SEV_ORDER.indexOf(b.severity));
-  }, [anomalyVehicles]);
+  }, [anomalyFeed, sensorId]);
 
   async function handleExport() {
     if (!sensorId) return;
@@ -153,7 +169,7 @@ export default function LiveView() {
             <ShieldAlert size={16} className="text-amber-400" />
             <h2 className="text-sm font-semibold text-white">Olumsuz Koşullar</h2>
           </div>
-          <span className="text-xs text-slate-400">{adverseConditions.length} aktif tür</span>
+          <span className="text-xs text-slate-400">{adverseConditions.length} tür</span>
         </div>
 
         {adverseConditions.length === 0 ? (
@@ -177,7 +193,8 @@ export default function LiveView() {
                     <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${SEV_BADGE[c.severity]}`}>
                       {c.severity}
                     </span>
-                    <span className="ml-auto text-xs text-slate-400">{c.count} araç</span>
+                    <span className="ml-auto text-xs text-slate-400">{c.count} olay</span>
+                    <span className="text-xs text-slate-500 w-full">Son: {relativeTime(c.lastAt)}</span>
                   </div>
                   {tr.impact && (
                     <p className="text-xs text-slate-300">
