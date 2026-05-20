@@ -19,3 +19,7 @@ VITE_API_URL değerini yeni URL ile güncelle → Save
 
 Deployments sekmesi → en üstteki deployment → ... → Redeploy
 Redeploy ~1 dakika sürer, sonra yhnt.vercel.app tekrar çalışır.
+
+
+
+docker logs highway-cloudflared 2>&1 | grep trycloudflare
