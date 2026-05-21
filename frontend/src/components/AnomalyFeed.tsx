@@ -72,7 +72,7 @@ function AnomalyEntry({ item, onLocate }: { item: AnomalyFeedItem; onLocate?: (t
         {onLocate && (
           <button
             onClick={() => onLocate(item.trackId)}
-            className="text-xs text-sky-600 hover:text-sky-500 transition-colors ml-1"
+            className="text-xs text-emerald-600 hover:text-emerald-500 transition-colors ml-1"
           >
             Locate
           </button>

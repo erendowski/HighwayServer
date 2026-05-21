@@ -243,7 +243,7 @@ export default function LiveView() {
                     flex flex-col items-center gap-1 p-3 rounded-xl border text-center
                     transition-all cursor-pointer
                     ${colorCls}
-                    ${isSelected ? 'ring-2 ring-sky-400 scale-105' : 'hover:scale-105'}
+                    ${isSelected ? 'ring-2 ring-emerald-400 scale-105' : 'hover:scale-105'}
                   `}
                 >
                   <span className="text-gray-600">
@@ -261,7 +261,7 @@ export default function LiveView() {
                       {topSev}
                     </span>
                   )}
-                  <span className="text-xs font-mono text-sky-600">
+                  <span className="text-xs font-mono text-emerald-600">
                     {v.speedKmh.toFixed(0)} km/h
                   </span>
                 </button>
@@ -276,7 +276,7 @@ export default function LiveView() {
             <div className="flex gap-2">
               <button
                 onClick={() => setModalOpen(true)}
-                className="text-sky-600 hover:text-sky-500 transition-colors"
+                className="text-emerald-600 hover:text-emerald-500 transition-colors"
               >
                 Detay
               </button>

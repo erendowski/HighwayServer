@@ -77,7 +77,7 @@ function VehicleRow({ v }: { v: VehicleState }) {
 
       {/* Speed */}
       {v.status !== 'lost' && (
-        <span className="text-xs font-mono font-semibold text-sky-600 shrink-0">
+        <span className="text-xs font-mono font-semibold text-emerald-600 shrink-0">
           {v.speedKmh.toFixed(0)} km/h
         </span>
       )}
@@ -136,13 +136,13 @@ export default function ActiveTracksPanel({ sensorId, className = '' }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-2">
-          <Activity size={20} className="text-sky-500" />
+          <Activity size={20} className="text-emerald-500" />
           <h2 className="text-sm font-semibold text-gray-900">Active Tracks</h2>
         </div>
         <select
           value={sortKey}
           onChange={e => setSortKey(e.target.value as SortKey)}
-          className="text-xs bg-white border border-gray-300 text-gray-700 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-sky-400"
+          className="text-xs bg-white border border-gray-300 text-gray-700 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-400"
         >
           <option value="status">Sort: Status</option>
           <option value="speed">Sort: Speed</option>

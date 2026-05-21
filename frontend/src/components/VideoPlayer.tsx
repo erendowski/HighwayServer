@@ -126,7 +126,7 @@ export default function VideoPlayer() {
     <div className="h-full flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-2">
-          <Video size={20} className="text-sky-500" />
+          <Video size={20} className="text-emerald-500" />
           <h2 className="text-sm font-semibold text-gray-900">Kamera — Canlı</h2>
         </div>
         <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
@@ -148,7 +148,7 @@ export default function VideoPlayer() {
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
             {state === 'connecting' ? (
               <>
-                <div className="w-6 h-6 border-2 border-slate-500 border-t-sky-400 rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-slate-500 border-t-emerald-400 rounded-full animate-spin" />
                 <span className="text-sm">Connecting to stream...</span>
               </>
             ) : (
@@ -156,7 +156,7 @@ export default function VideoPlayer() {
                 <VideoOff size={40} className="text-slate-600" />
                 <span className="text-sm">Waiting for Jetson stream...</span>
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <Radio size={12} className="animate-pulse text-sky-500" />
+                  <Radio size={12} className="animate-pulse text-emerald-500" />
                   <span>highway path</span>
                 </div>
               </>

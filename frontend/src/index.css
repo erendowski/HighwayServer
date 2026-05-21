@@ -8,7 +8,8 @@ html,
 body,
 #root {
   height: 100%;
-  background-color: #f9fafb; /* gray-50 */
+  /* Yumuşak yeşil-gri zemin — göz yormayan, ferah bir taban */
+  background-color: #eef3ef;
 }
 
 body {

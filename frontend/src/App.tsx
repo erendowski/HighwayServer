@@ -14,7 +14,7 @@ export default function App() {
   });
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 text-gray-900">
+    <div className="h-screen flex flex-col overflow-hidden bg-[#eef3ef] text-gray-900">
       <ToastContainer />
       <div style={{ position: 'fixed', top: 8, right: 16, fontSize: 11, color: connected ? '#16a34a' : '#dc2626', zIndex: 9999 }}>
         {connected ? '● Live' : error ? '✕ Error' : '○ Connecting...'}
@@ -29,8 +29,8 @@ export default function App() {
           className={({ isActive }) =>
             `text-sm px-3 py-1.5 rounded-lg transition-colors ${
               isActive
-                ? 'bg-sky-600 text-white'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                ? 'bg-emerald-600 text-white'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-emerald-50'
             }`
           }
         >
@@ -42,8 +42,8 @@ export default function App() {
           className={({ isActive }) =>
             `text-sm px-3 py-1.5 rounded-lg transition-colors ${
               isActive
-                ? 'bg-sky-600 text-white'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                ? 'bg-emerald-600 text-white'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-emerald-50'
             }`
           }
         >
