@@ -11,7 +11,7 @@ export default function AnomalyAlert() {
       {offline.map(sensor => (
         <div
           key={sensor.sensorId}
-          className="bg-red-900/30 border border-red-600/40 rounded-xl p-4 text-red-300 text-sm"
+          className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm"
         >
           ⚠ Sensor <span className="font-mono font-semibold">{sensor.sensorId}</span> is
           offline — last seen {new Date(sensor.lastSeenAt).toLocaleString()}

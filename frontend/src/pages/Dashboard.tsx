@@ -9,19 +9,19 @@ import AnomalyAlert from '../components/AnomalyAlert'
 import ActiveTracksPanel from '../components/ActiveTracksPanel'
 import AnomalyFeed from '../components/AnomalyFeed'
 
-const CARD = 'rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm'
+const CARD = 'rounded-2xl border border-gray-200 bg-white shadow-sm'
 
 function KpiCard({ icon, label, value, sub }: {
   icon: React.ReactNode; label: string; value: string | number; sub?: string
 }) {
   return (
     <div className={`${CARD} p-4 flex flex-col gap-1`}>
-      <div className="flex items-center gap-2 text-slate-400 text-xs">
+      <div className="flex items-center gap-2 text-gray-500 text-xs">
         {icon}
         <span>{label}</span>
       </div>
-      <p className="text-2xl font-bold text-white leading-tight">{value}</p>
-      {sub && <p className="text-xs text-slate-500">{sub}</p>}
+      <p className="text-2xl font-bold text-gray-900 leading-tight">{value}</p>
+      {sub && <p className="text-xs text-gray-400">{sub}</p>}
     </div>
   )
 }
@@ -94,7 +94,7 @@ export default function Dashboard() {
           {sensorId ? (
             <FpsChart sensorId={sensorId} height={150} />
           ) : (
-            <div className="flex items-center justify-center h-36 text-slate-500 text-sm">
+            <div className="flex items-center justify-center h-36 text-gray-400 text-sm">
               Sensör bekleniyor...
             </div>
           )}

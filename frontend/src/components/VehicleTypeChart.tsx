@@ -24,8 +24,8 @@ export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
 
   if (events.length === 0) {
     return (
-      <div className="bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center h-60">
-        <span className="text-slate-500 text-sm">No data</span>
+      <div className="bg-white flex items-center justify-center h-60">
+        <span className="text-gray-400 text-sm">No data</span>
       </div>
     );
   }
@@ -37,31 +37,31 @@ export default function VehicleTypeChart({ sensorId }: VehicleTypeChartProps) {
   }));
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 flex flex-col h-60">
-      <h2 className="text-sm font-semibold text-slate-300 p-4 border-b border-slate-700 shrink-0">
+    <div className="bg-white flex flex-col h-60">
+      <h2 className="text-sm font-semibold text-gray-700 p-4 border-b border-gray-200 shrink-0">
         Vehicle Classes — {sensorId}
       </h2>
       <div className="flex-1 p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              tick={{ fill: '#6b7280', fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              tick={{ fill: '#6b7280', fontSize: 11 }}
               allowDecimals={false}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
-              cursor={{ fill: 'rgba(148,163,184,0.08)' }}
-              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: 8 }}
-              labelStyle={{ color: '#cbd5e1' }}
-              itemStyle={{ color: '#94a3b8' }}
+              cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+              contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 8 }}
+              labelStyle={{ color: '#374151' }}
+              itemStyle={{ color: '#6b7280' }}
               formatter={(value) => [value, 'Tracks']}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>

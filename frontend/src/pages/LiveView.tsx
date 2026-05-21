@@ -20,17 +20,17 @@ const CLASS_ICONS: Record<string, React.ReactNode> = {
 };
 
 const SEV_COLORS: Record<AnomalySeverity, string> = {
-  critical: 'border-red-600/60 bg-red-900/30',
-  high:     'border-orange-600/60 bg-orange-900/30',
-  medium:   'border-amber-600/60 bg-amber-900/30',
-  low:      'border-yellow-600/60 bg-yellow-900/20',
+  critical: 'border-red-300 bg-red-50',
+  high:     'border-orange-300 bg-orange-50',
+  medium:   'border-amber-300 bg-amber-50',
+  low:      'border-yellow-300 bg-yellow-50',
 };
 
 const SEV_BADGE: Record<AnomalySeverity, string> = {
-  critical: 'bg-red-500/20 text-red-400',
-  high:     'bg-orange-500/20 text-orange-400',
-  medium:   'bg-amber-500/20 text-amber-400',
-  low:      'bg-yellow-500/20 text-yellow-400',
+  critical: 'bg-red-100 text-red-700',
+  high:     'bg-orange-100 text-orange-700',
+  medium:   'bg-amber-100 text-amber-700',
+  low:      'bg-yellow-100 text-yellow-700',
 };
 
 const SEV_ORDER: AnomalySeverity[] = ['critical', 'high', 'medium', 'low'];
@@ -105,11 +105,11 @@ export default function LiveView() {
     }
   }
 
-  if (!sensorId) return <div className="p-8 text-slate-400">Sensör bulunamadı</div>;
+  if (!sensorId) return <div className="p-8 text-gray-500">Sensör bulunamadı</div>;
 
   const statusColor = sensor
-    ? ({ online: 'text-green-400', offline: 'text-red-400', unknown: 'text-slate-400' } as Record<string, string>)[sensor.status]
-    : 'text-slate-400';
+    ? ({ online: 'text-green-600', offline: 'text-red-600', unknown: 'text-gray-500' } as Record<string, string>)[sensor.status]
+    : 'text-gray-500';
 
   function selectTrack(trackId: number) {
     setSelectedTrackId(prev => (prev === trackId ? null : trackId));
@@ -122,12 +122,12 @@ export default function LiveView() {
       <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <ArrowLeft size={14} />
           Geri
         </button>
-        <h1 className="text-lg font-semibold text-white">
+        <h1 className="text-lg font-semibold text-gray-900">
           Canlı İzleme — <span className="font-mono">{sensorId}</span>
         </h1>
         {sensor && (
@@ -138,7 +138,7 @@ export default function LiveView() {
 
         <div className="ml-auto flex items-center gap-2">
           {exportError && (
-            <span className="text-xs text-red-400">{exportError}</span>
+            <span className="text-xs text-red-600">{exportError}</span>
           )}
           <button
             onClick={handleExport}
@@ -163,17 +163,17 @@ export default function LiveView() {
       </div>
 
       {/* Olumsuz koşullar özeti */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/60">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <ShieldAlert size={16} className="text-amber-400" />
-            <h2 className="text-sm font-semibold text-white">Olumsuz Koşullar</h2>
+            <ShieldAlert size={16} className="text-amber-500" />
+            <h2 className="text-sm font-semibold text-gray-900">Olumsuz Koşullar</h2>
           </div>
-          <span className="text-xs text-slate-400">{adverseConditions.length} tür</span>
+          <span className="text-xs text-gray-500">{adverseConditions.length} tür</span>
         </div>
 
         {adverseConditions.length === 0 ? (
-          <p className="px-4 py-6 text-center text-slate-500 text-sm">
+          <p className="px-4 py-6 text-center text-gray-400 text-sm">
             Şu anda olumsuz bir koşul tespit edilmedi
           </p>
         ) : (
@@ -188,22 +188,22 @@ export default function LiveView() {
                   className={`rounded-xl border p-3 space-y-1.5 ${SEV_COLORS[c.severity]}`}
                 >
                   <div className="flex items-center gap-2 flex-wrap">
-                    <AlertTriangle size={14} className="text-amber-300 shrink-0" />
-                    <span className="text-sm font-semibold text-white">{tr.title}</span>
+                    <AlertTriangle size={14} className="text-amber-500 shrink-0" />
+                    <span className="text-sm font-semibold text-gray-900">{tr.title}</span>
                     <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${SEV_BADGE[c.severity]}`}>
                       {c.severity}
                     </span>
-                    <span className="ml-auto text-xs text-slate-400">{c.count} olay</span>
-                    <span className="text-xs text-slate-500 w-full">Son: {relativeTime(c.lastAt)}</span>
+                    <span className="ml-auto text-xs text-gray-500">{c.count} olay</span>
+                    <span className="text-xs text-gray-400 w-full">Son: {relativeTime(c.lastAt)}</span>
                   </div>
                   {tr.impact && (
-                    <p className="text-xs text-slate-300">
-                      <span className="font-semibold text-slate-200">Etki: </span>{tr.impact}
+                    <p className="text-xs text-gray-600">
+                      <span className="font-semibold text-gray-800">Etki: </span>{tr.impact}
                     </p>
                   )}
                   {tr.recommendation && (
-                    <p className="text-xs text-slate-300">
-                      <span className="font-semibold text-amber-400">Aksiyon: </span>{tr.recommendation}
+                    <p className="text-xs text-gray-600">
+                      <span className="font-semibold text-amber-600">Aksiyon: </span>{tr.recommendation}
                     </p>
                   )}
                 </div>
@@ -214,17 +214,17 @@ export default function LiveView() {
       </div>
 
       {/* Anomali araçlar */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/60 shrink-0">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-red-400" />
-            <h2 className="text-sm font-semibold text-white">Anomali Araçlar</h2>
+            <AlertTriangle size={16} className="text-red-500" />
+            <h2 className="text-sm font-semibold text-gray-900">Anomali Araçlar</h2>
           </div>
-          <span className="text-xs text-slate-400">{anomalyVehicles.length} araç</span>
+          <span className="text-xs text-gray-500">{anomalyVehicles.length} araç</span>
         </div>
 
         {anomalyVehicles.length === 0 ? (
-          <p className="px-4 py-8 text-center text-slate-500 text-sm">
+          <p className="px-4 py-8 text-center text-gray-400 text-sm">
             Şu anda anomali tespit edilmedi
           </p>
         ) : (
@@ -232,7 +232,7 @@ export default function LiveView() {
             {anomalyVehicles.map(v => {
               const isSelected = v.trackId === selectedTrackId;
               const topSev     = v.anomalies[0]?.severity as AnomalySeverity | undefined;
-              const colorCls   = topSev ? SEV_COLORS[topSev] : 'border-slate-600/40 bg-slate-700/20';
+              const colorCls   = topSev ? SEV_COLORS[topSev] : 'border-gray-200 bg-gray-50';
               return (
                 <button
                   key={v.trackId}
@@ -243,16 +243,16 @@ export default function LiveView() {
                     flex flex-col items-center gap-1 p-3 rounded-xl border text-center
                     transition-all cursor-pointer
                     ${colorCls}
-                    ${isSelected ? 'ring-2 ring-white/40 scale-105' : 'hover:scale-105'}
+                    ${isSelected ? 'ring-2 ring-sky-400 scale-105' : 'hover:scale-105'}
                   `}
                 >
-                  <span className="text-slate-200">
+                  <span className="text-gray-600">
                     {CLASS_ICONS[v.classLabel] ?? <Car size={24} />}
                   </span>
-                  <span className="text-xs font-mono text-white font-semibold">
+                  <span className="text-xs font-mono text-gray-900 font-semibold">
                     #{v.trackId}
                   </span>
-                  <span className="text-xs text-slate-300 capitalize">
+                  <span className="text-xs text-gray-600 capitalize">
                     {v.classLabel}
                   </span>
                   {topSev && (
@@ -261,7 +261,7 @@ export default function LiveView() {
                       {topSev}
                     </span>
                   )}
-                  <span className="text-xs font-mono text-sky-300">
+                  <span className="text-xs font-mono text-sky-600">
                     {v.speedKmh.toFixed(0)} km/h
                   </span>
                 </button>
@@ -271,18 +271,18 @@ export default function LiveView() {
         )}
 
         {selectedTrackId !== null && (
-          <div className="px-4 py-2 border-t border-slate-700/60 text-xs text-slate-400 flex items-center justify-between">
+          <div className="px-4 py-2 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between">
             <span>Track #{selectedTrackId} seçili</span>
             <div className="flex gap-2">
               <button
                 onClick={() => setModalOpen(true)}
-                className="text-sky-400 hover:text-sky-300 transition-colors"
+                className="text-sky-600 hover:text-sky-500 transition-colors"
               >
                 Detay
               </button>
               <button
                 onClick={() => setSelectedTrackId(null)}
-                className="text-slate-500 hover:text-slate-300 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 Seçimi kaldır
               </button>

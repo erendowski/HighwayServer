@@ -25,32 +25,32 @@ export default function FpsChart({ sensorId, height = 220 }: FpsChartProps) {
   }, [sensor?.lastStats]);
 
   return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-      <h2 className="text-sm font-semibold text-slate-300 mb-3">
+    <div className="bg-white p-4">
+      <h2 className="text-sm font-semibold text-gray-700 mb-3">
         Processing FPS — {sensorId}
       </h2>
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={history} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="t"
-            tick={{ fill: '#94a3b8', fontSize: 11 }}
+            tick={{ fill: '#6b7280', fontSize: 11 }}
             interval="preserveStartEnd"
           />
           <YAxis
             domain={[0, 35]}
-            tick={{ fill: '#94a3b8', fontSize: 11 }}
+            tick={{ fill: '#6b7280', fontSize: 11 }}
             unit=" FPS"
           />
           <Tooltip
-            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: 8 }}
-            labelStyle={{ color: '#cbd5e1' }}
-            itemStyle={{ color: '#22c55e' }}
+            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 8 }}
+            labelStyle={{ color: '#374151' }}
+            itemStyle={{ color: '#16a34a' }}
           />
           <Line
             type="monotone"
             dataKey="fps"
-            stroke="#22c55e"
+            stroke="#16a34a"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 4 }}

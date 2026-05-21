@@ -1,0 +1,4 @@
+git pull 
+
+docker compose up -d --build highwayserver
+docker compose ps 

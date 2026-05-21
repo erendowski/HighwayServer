@@ -12,11 +12,11 @@ export interface TrafficDensity {
 }
 
 const LEVELS: Record<DensityLevel, { label: string; color: string; badgeClass: string }> = {
-  free:     { label: 'Akıcı',          color: '#22c55e', badgeClass: 'bg-green-500/20 text-green-300 border-green-600/40' },
-  light:    { label: 'Hafif',          color: '#84cc16', badgeClass: 'bg-lime-500/20 text-lime-300 border-lime-600/40' },
-  moderate: { label: 'Orta Yoğunluk',  color: '#f59e0b', badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-600/40' },
-  heavy:    { label: 'Yoğun',          color: '#f97316', badgeClass: 'bg-orange-500/20 text-orange-300 border-orange-600/40' },
-  jam:      { label: 'Tıkalı',         color: '#ef4444', badgeClass: 'bg-red-500/20 text-red-300 border-red-600/40' },
+  free:     { label: 'Akıcı',          color: '#22c55e', badgeClass: 'bg-green-100 text-green-700 border-green-200' },
+  light:    { label: 'Hafif',          color: '#84cc16', badgeClass: 'bg-lime-100 text-lime-700 border-lime-200' },
+  moderate: { label: 'Orta Yoğunluk',  color: '#f59e0b', badgeClass: 'bg-amber-100 text-amber-700 border-amber-200' },
+  heavy:    { label: 'Yoğun',          color: '#f97316', badgeClass: 'bg-orange-100 text-orange-700 border-orange-200' },
+  jam:      { label: 'Tıkalı',         color: '#ef4444', badgeClass: 'bg-red-100 text-red-700 border-red-200' },
 };
 
 /**

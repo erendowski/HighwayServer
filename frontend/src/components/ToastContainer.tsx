@@ -3,10 +3,10 @@ import { useToastStore } from '../store/toastStore';
 import type { AnomalySeverity } from '../types/contracts';
 
 const SEV_STYLE: Record<AnomalySeverity, string> = {
-  critical: 'border-red-600/60 bg-red-950/90 text-red-100',
-  high:     'border-orange-600/60 bg-orange-950/90 text-orange-100',
-  medium:   'border-amber-600/60 bg-amber-950/90 text-amber-100',
-  low:      'border-slate-600/60 bg-slate-900/90 text-slate-200',
+  critical: 'border-red-200 bg-red-50 text-red-800',
+  high:     'border-orange-200 bg-orange-50 text-orange-800',
+  medium:   'border-amber-200 bg-amber-50 text-amber-800',
+  low:      'border-gray-200 bg-white text-gray-700',
 };
 
 export default function ToastContainer() {

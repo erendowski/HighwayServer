@@ -142,13 +142,13 @@ export default function MapView({
     : null;
 
   return (
-    <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700 gap-2 flex-wrap">
-        <h2 className="text-sm font-semibold text-slate-300">Araç Haritası — {sensorId}</h2>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 gap-2 flex-wrap">
+        <h2 className="text-sm font-semibold text-gray-900">Araç Haritası — {sensorId}</h2>
         <div className="flex items-center gap-2">
           {/* Isı haritası toggle */}
-          <div className="flex items-center rounded-lg overflow-hidden border border-slate-600 text-xs">
-            <span className="px-1.5 py-0.5 bg-slate-800 text-slate-400 flex items-center gap-1">
+          <div className="flex items-center rounded-lg overflow-hidden border border-gray-300 text-xs">
+            <span className="px-1.5 py-0.5 bg-gray-100 text-gray-500 flex items-center gap-1">
               <Flame size={11} />
             </span>
             {([
@@ -161,8 +161,8 @@ export default function MapView({
                 onClick={() => setHeatMode(mode)}
                 className={`px-2 py-0.5 transition-colors ${
                   heatMode === mode
-                    ? 'bg-orange-600 text-white font-semibold'
-                    : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                    ? 'bg-orange-500 text-white font-semibold'
+                    : 'bg-white text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                 }`}
               >
                 {label}
@@ -175,7 +175,7 @@ export default function MapView({
           >
             Trafik: {density.label}
           </span>
-          <span className="text-xs text-slate-400">{tracks.length} aktif</span>
+          <span className="text-xs text-gray-500">{tracks.length} aktif</span>
         </div>
       </div>
       <div className="relative aspect-video w-full">

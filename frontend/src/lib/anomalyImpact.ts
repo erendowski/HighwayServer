@@ -98,15 +98,15 @@ export const ANOMALY_TR: Record<string, AnomalyImpactTr> = {
 };
 
 export const SEVERITY_COLORS: Record<AnomalySeverity, string> = {
-  low:      'bg-slate-700/60 text-slate-300 border-slate-600',
-  medium:   'bg-amber-900/60 text-amber-300 border-amber-700',
-  high:     'bg-red-900/60 text-red-300 border-red-700',
-  critical: 'bg-red-950/80 text-red-200 border-red-600',
+  low:      'bg-gray-50 text-gray-700 border-gray-200',
+  medium:   'bg-amber-50 text-amber-800 border-amber-200',
+  high:     'bg-red-50 text-red-800 border-red-200',
+  critical: 'bg-red-100 text-red-900 border-red-300',
 };
 
 export const SEVERITY_BADGE: Record<AnomalySeverity, string> = {
-  low:      'bg-slate-600 text-slate-200',
-  medium:   'bg-amber-700 text-amber-100',
-  high:     'bg-red-700 text-red-100',
+  low:      'bg-gray-200 text-gray-700',
+  medium:   'bg-amber-200 text-amber-800',
+  high:     'bg-red-200 text-red-800',
   critical: 'bg-red-600 text-white animate-pulse',
 };

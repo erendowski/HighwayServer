@@ -123,18 +123,18 @@ export default function VideoPlayer() {
   }, [connect]);
 
   return (
-    <div className="h-full flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900/60 backdrop-blur shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700/60 shrink-0">
+    <div className="h-full flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-2">
-          <Video size={20} className="text-sky-400" />
-          <h2 className="text-sm font-semibold text-white">Kamera — Canlı</h2>
+          <Video size={20} className="text-sky-500" />
+          <h2 className="text-sm font-semibold text-gray-900">Kamera — Canlı</h2>
         </div>
         <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
           state === 'playing'
-            ? 'bg-red-700/80 text-white animate-pulse'
+            ? 'bg-red-600 text-white animate-pulse'
             : state === 'connecting'
-            ? 'bg-yellow-900 text-yellow-300'
-            : 'bg-slate-800 text-slate-400'
+            ? 'bg-yellow-100 text-yellow-700'
+            : 'bg-gray-100 text-gray-500'
         }`}>
           <Radio size={10} />
           {state === 'playing' ? 'LIVE' : state === 'connecting' ? 'Connecting' : 'Offline'}
